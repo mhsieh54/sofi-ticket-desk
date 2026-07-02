@@ -409,30 +409,6 @@ input::placeholder, textarea::placeholder { color: #2e3545; }
   margin-top: 4px;
 }
 
-/* Sold section */
-.sold-toggle {
-  margin-top: 20px;
-  color: #5a6478;
-  font-size: 12px;
-  font-family: monospace;
-  cursor: pointer;
-  padding: 8px 4px;
-}
-.sold-list { display: flex; flex-direction: column; gap: 6px; }
-.sold-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  flex-wrap: wrap;
-  background: #111418;
-  border: 1px solid #1a1f2a;
-  border-radius: 6px;
-  padding: 8px 12px;
-  font-size: 12px;
-  font-family: monospace;
-  color: #a8b3cf;
-}
-
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: #0a0d12; }
 ::-webkit-scrollbar-thumb { background: #1e2530; border-radius: 3px; }

@@ -101,7 +101,7 @@ function buildTimeline(inventory: Position[]): TimelineItem[] {
   return items;
 }
 
-type Tab = "overview" | "inventory" | "football";
+type Tab = "overview" | "inventory" | "football" | "sold";
 
 export default function DashboardPage() {
   const [inventory, setInventory] = useState<Position[] | null>(null);
@@ -110,7 +110,6 @@ export default function DashboardPage() {
   const [error, setError] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
   const [sellingId, setSellingId] = useState<number | null>(null);
-  const [showSold, setShowSold] = useState(false);
   const [tab, setTab] = useState<Tab>("overview");
   const router = useRouter();
 
@@ -170,6 +169,11 @@ export default function DashboardPage() {
   const footballPositions = sortedInventory.filter((p) => p.event.startsWith("Rams"));
   const timeline = buildTimeline(inventory);
 
+  const soldTotalCost = sold.reduce((s, p) => s + p.face * p.qty, 0);
+  const soldTotalPayout = sold.reduce((s, p) => s + (p.soldPayout ?? 0) * p.qty, 0);
+  const soldROI = soldTotalCost > 0 ? (realizedProfit / soldTotalCost) * 100 : 0;
+  const sortedSold = [...sold].sort((a, b) => (b.soldDate || "").localeCompare(a.soldDate || ""));
+
   function editHandlers(p: Position) {
     return {
       editing: editingId === p.id,
@@ -207,6 +211,7 @@ export default function DashboardPage() {
         <button className={`tab-btn ${tab === "overview" ? "active" : ""}`} onClick={() => setTab("overview")}>Overview</button>
         <button className={`tab-btn ${tab === "inventory" ? "active" : ""}`} onClick={() => setTab("inventory")}>Inventory</button>
         <button className={`tab-btn ${tab === "football" ? "active" : ""}`} onClick={() => setTab("football")}>Football</button>
+        <button className={`tab-btn ${tab === "sold" ? "active" : ""}`} onClick={() => setTab("sold")}>Sold</button>
       </nav>
 
       <div className="page-inner">
@@ -256,27 +261,6 @@ export default function DashboardPage() {
                 <TicketRow key={p.id} p={p} {...editHandlers(p)} />
               ))}
             </div>
-
-            <div className="sold-toggle" onClick={() => setShowSold(!showSold)}>
-              {showSold ? "▾" : "▸"} Sold positions ({sold.length}) — ${realizedProfit.toFixed(0)} realized
-            </div>
-            {showSold && (
-              <div className="sold-list">
-                {sold.map((p) => {
-                  const profit = ((p.soldPayout ?? 0) - p.face) * p.qty;
-                  return (
-                    <div key={p.id} className="sold-row">
-                      <span>{p.event} — {p.date}</span>
-                      <span>Sec {p.section} Row {p.row} · {p.qty}x</span>
-                      <span>{p.platform} @ ${p.ask}</span>
-                      <span style={{ color: profit >= 0 ? "#4ade80" : "#f87171" }}>
-                        {profit >= 0 ? "+" : ""}${profit.toFixed(0)}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
           </div>
         )}
 
@@ -297,6 +281,36 @@ export default function DashboardPage() {
                 <div className="roadmap-empty">No football positions found.</div>
               ) : (
                 footballPositions.map((p) => <TicketRow key={p.id} p={p} {...editHandlers(p)} />)
+              )}
+            </div>
+          </div>
+        )}
+
+        {tab === "sold" && (
+          <div>
+            <div className="page-title">Sold</div>
+            <div className="page-subtitle">Realized sales — closed-out positions with actual net/profit.</div>
+
+            <div className="stats">
+              <StatCard
+                label="Realized P&L"
+                value={`$${realizedProfit.toFixed(0)}`}
+                accent={realizedProfit >= 0 ? "#4ade80" : "#f87171"}
+                sub={`${sold.length} sold`}
+              />
+              <StatCard label="Total Cost" value={`$${soldTotalCost.toLocaleString(undefined, { maximumFractionDigits: 0 })}`} />
+              <StatCard label="Total Payout" value={`$${soldTotalPayout.toLocaleString(undefined, { maximumFractionDigits: 0 })}`} accent="#60a5fa" />
+              <StatCard label="Blended ROI" value={`${soldROI.toFixed(0)}%`} accent="#F0C040" />
+            </div>
+
+            <div className="list-panel">
+              <div className="list-panel-header">
+                <span className="list-panel-label">Sold ({sold.length})</span>
+              </div>
+              {sortedSold.length === 0 ? (
+                <div className="roadmap-empty">No sold positions yet.</div>
+              ) : (
+                sortedSold.map((p) => <SoldRow key={p.id} p={p} />)
               )}
             </div>
           </div>
@@ -500,6 +514,56 @@ function TicketRow({
           </button>
         </div>
       )}
+    </div>
+  );
+}
+
+function SoldRow({ p }: { p: Position }) {
+  const profit = p.soldPayout != null ? (p.soldPayout - p.face) * p.qty : 0;
+  const roi = p.soldPayout != null ? ((p.soldPayout - p.face) / p.face) * 100 : 0;
+
+  return (
+    <div className="ticket-row">
+      <div className="ticket-main">
+        <div className="ticket-event">
+          {p.event}
+          <span
+            className="badge"
+            style={{
+              background: CATEGORY_COLOR[p.category] + "22",
+              color: CATEGORY_COLOR[p.category],
+              border: `1px solid ${CATEGORY_COLOR[p.category]}44`,
+            }}
+          >
+            {p.category}
+          </span>
+        </div>
+        <div className="ticket-meta">
+          Sec {p.section} · Row {p.row} · Seats {p.seats} · {p.qty}x · event {p.date} · sold {p.soldDate}
+        </div>
+      </div>
+
+      <span className="ticket-figure">Cost: <strong>${p.face.toFixed(0)}</strong></span>
+      <span className="ticket-figure">Sold: <strong style={{ color: "#F0C040" }}>${p.ask}</strong></span>
+      {p.platform && (
+        <span
+          className="badge-platform"
+          style={{
+            background: (PLATFORM_COLOR[p.platform] || "#5a6478") + "22",
+            color: PLATFORM_COLOR[p.platform] || "#5a6478",
+            border: `1px solid ${(PLATFORM_COLOR[p.platform] || "#5a6478")}44`,
+          }}
+        >
+          {p.platform}
+        </span>
+      )}
+      <span className="ticket-figure">
+        Net: <strong style={{ color: profit >= 0 ? "#4ade80" : "#f87171" }}>
+          {profit >= 0 ? "+" : ""}${profit.toFixed(0)} ({roi.toFixed(0)}% ROI)
+        </strong>
+      </span>
+
+      {p.notes && <div className="ticket-notes">{p.notes}</div>}
     </div>
   );
 }
