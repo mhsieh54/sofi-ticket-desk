@@ -1,0 +1,8 @@
+{
+  "name": "sofi-ticket-scripts",
+  "private": true,
+  "description": "Standalone automation scripts (market-brief agent). Kept separate from the dashboard so its deps never touch the Next.js build.",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.110.0"
+  }
+}

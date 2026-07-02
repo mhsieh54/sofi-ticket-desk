@@ -1,0 +1,54 @@
+name: Market brief
+
+# Runs the scheduled market-narrative agent a few times a week, then commits
+# the generated brief to data/briefs/. The commit triggers a Vercel redeploy,
+# so the brief reaches every device. Also runnable on demand from the Actions
+# tab (workflow_dispatch) — use that to test before trusting the schedule.
+
+on:
+  schedule:
+    # Mon / Wed / Fri at 14:00 UTC (~6-7am Los Angeles, DST-dependent).
+    - cron: "0 14 * * 1,3,5"
+  workflow_dispatch:
+    inputs:
+      model:
+        description: "Model override (e.g. claude-sonnet-5 for lower cost)"
+        required: false
+        default: ""
+
+concurrency:
+  group: market-brief
+  cancel-in-progress: false
+
+jobs:
+  brief:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install script dependencies
+        run: npm install --prefix scripts
+
+      - name: Generate market brief
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          MODEL: ${{ github.event.inputs.model }}
+        run: node scripts/market-brief.mjs
+
+      - name: Commit brief if changed
+        run: |
+          git config user.name "sofi-market-bot"
+          git config user.email "actions@github.com"
+          git add data/briefs
+          if git diff --staged --quiet; then
+            echo "No brief changes to commit."
+          else
+            git commit -m "Market brief $(date -u +%Y-%m-%d)"
+            git push
+          fi

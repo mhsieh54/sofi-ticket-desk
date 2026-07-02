@@ -11,11 +11,13 @@ Rules, platform fees, and workflow conventions live in [CLAUDE.md](./CLAUDE.md).
 | `data/inventory.json` | Active positions — everything bought, not yet sold/resolved |
 | `data/sold.json` | Realized sales — closed-out positions with actual net/profit |
 | `data/comps.json` | Append-only log of section-floor comp readings, entered from the dashboard's Comps tab |
+| `data/briefs/YYYY-MM-DD.md` | Market-narrative briefs written by the scheduled agent (see below) |
 | `data/journal.md` | Running log of sales, profit, ROI |
 | `strategy/<event>.md` | Per-event pricing/exit strategy, one file per event |
 | `handoffs/YYYY-MM-DD.md` | Session-to-session handoff notes — what happened, what's next |
-| `scripts/` | Comp scraping and automation scripts |
+| `scripts/` | Automation scripts (market-brief agent); self-contained package, separate from the dashboard build |
 | `dashboard/` | Local dashboard app for viewing positions/comps |
+| `.github/workflows/` | GitHub Actions — the scheduled market-brief run |
 
 ## Running it
 
@@ -64,6 +66,15 @@ After this is set up, every edit made from any device (phone included) becomes a
 
 **Local development:** `npm run dev` works immediately for read-only testing against a local copy of `.env.local` (see `dashboard/.env.local.example`) — no GitHub/Vercel setup needed just to view data locally. Only the write path (mark sold, edit) requires the real GitHub token.
 
+## Comp checking
+
+Two complementary pieces:
+
+- **Manual floors (reliable numbers)** — the dashboard's **Comps** tab. Log a section's floor + 2nd/3rd comp while you're on the live map; the app trends it and flags any listing whose ask drifts >10% above the latest floor. Stored in `data/comps.json`.
+- **Market narrative (automated context)** — a scheduled agent (`scripts/market-brief.mjs`) that web-searches current demand/pricing signals for each active SELL event and writes a dated brief to `data/briefs/`. Runs via GitHub Actions **Mon/Wed/Fri**. Directional read, *not* exact floors — the two work together.
+
+**One-time setup for the market agent:** add an `ANTHROPIC_API_KEY` secret to the repo (GitHub → Settings → Secrets and variables → Actions → New repository secret). That's the only manual step. To test immediately: Actions tab → **Market brief** → **Run workflow**. To run cheaper, set the optional `model` input (e.g. `claude-sonnet-5`) when running manually, or add a `MODEL` env in the workflow — it defaults to `claude-opus-4-8`.
+
 ## Status
 
-Session 4: dashboard built (Next.js, password-gated, GitHub-API write-back, deploys to Vercel). Local read/write UI tested and working; account setup (GitHub repo, Vercel project, env vars) is the one remaining manual step — see above. Session 1-3 history: project bootstrap and inventory/strategy migration from the original React artifact (`sofi-ticket-manager.jsx`), tracked in `handoffs/`.
+Live: dashboard deployed to Vercel (Overview / Inventory / Football / Comps / Sold tabs), write-back to GitHub working from any device. Comp checking built out — manual floor logging + drift flags, plus a scheduled market-brief agent (needs the `ANTHROPIC_API_KEY` secret to run). Full session-by-session history in `handoffs/`.
