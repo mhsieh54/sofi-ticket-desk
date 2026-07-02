@@ -6,9 +6,9 @@
 ## Current Holdings & Status
 | Sec | Row | Seats | Qty | Face | Category | Status |
 |---|---|---|---|---|---|---|
-| FL-A5 | 6 | — | 6 | $653.90 | CLIENT | Held |
+| FL-A5 | 6 | — | 6 | $653.90 | KEEP | Held |
 
-**Co-ownership confirmed: James owns 2 of 6 tickets, keeps/attends his own — no resale, no proceeds split needed on his portion. Mark's 4 of 6 are also ATTEND.** Category remains CLIENT (rather than switching to plain ATTEND) to keep the co-ownership flagged for accounting purposes, since James's share was co-purchased and isn't fully Mark's capital.
+**Co-ownership confirmed: James owns 2 of 6 tickets, keeps/attends his own — no resale, no proceeds split needed on his portion. Mark's 4 of 6 are also ATTEND.** Category set to KEEP per Mark's call — the co-ownership split (James's 2 of 6) is still tracked via `clientReserved` in `data/inventory.json` even though the category itself is KEEP, not CLIENT.
 
 ## Strategy Playbook
 None needed — this is a full ATTEND position for both parties. No listing, no target pricing, no platform selection required.
