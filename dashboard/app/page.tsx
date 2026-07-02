@@ -194,21 +194,6 @@ export default function DashboardPage() {
   // hold, so this one stays un-annualized (matches the original artifact).
   const realizedROI = soldTotalCost > 0 ? realizedProfit / soldTotalCost : 0;
 
-  // Cost-weighted blended IRR, annualized, for closed positions.
-  const realizedIRR = (() => {
-    let weightedIRR = 0;
-    let totalCostWeight = 0;
-    sold.forEach((p) => {
-      if (!p.purchaseDate || !p.soldDate || p.soldPayout == null) return;
-      const cost = p.face * p.qty;
-      const payout = p.soldPayout * p.qty;
-      const days = Math.max(1, (new Date(p.soldDate).getTime() - new Date(p.purchaseDate).getTime()) / 86400000);
-      weightedIRR += calcIRR(cost, payout, days) * cost;
-      totalCostWeight += cost;
-    });
-    return totalCostWeight > 0 ? weightedIRR / totalCostWeight : 0;
-  })();
-
   // Cost-weighted blended IRR, annualized, for active SELL positions with a
   // defined target — projects the return if every target sale lands on its
   // targetSellDate.
@@ -363,14 +348,7 @@ export default function DashboardPage() {
               />
               <StatCard label="Total Cost" value={`$${soldTotalCost.toLocaleString(undefined, { maximumFractionDigits: 0 })}`} />
               <StatCard label="Total Payout" value={`$${soldTotalPayout.toLocaleString(undefined, { maximumFractionDigits: 0 })}`} accent="#60a5fa" />
-              <StatCard
-                label="Blended ROI"
-                value={`${soldROI.toFixed(0)}%`}
-                accent="#F0C040"
-                rate={fmtPct(realizedIRR)}
-                rateLabel="Annualized IRR"
-                sub="simple ROI · annualized rate"
-              />
+              <StatCard label="Blended ROI" value={`${soldROI.toFixed(0)}%`} accent="#F0C040" />
             </div>
 
             <div className="list-panel">
