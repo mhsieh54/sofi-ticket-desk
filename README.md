@@ -10,7 +10,7 @@ Rules, platform fees, and workflow conventions live in [CLAUDE.md](./CLAUDE.md).
 |---|---|
 | `data/inventory.json` | Active positions — everything bought, not yet sold/resolved |
 | `data/sold.json` | Realized sales — closed-out positions with actual net/profit |
-| `data/comps/YYYY-MM-DD/<event>.json` | Daily comp price snapshots per event/section |
+| `data/comps.json` | Append-only log of section-floor comp readings, entered from the dashboard's Comps tab |
 | `data/journal.md` | Running log of sales, profit, ROI |
 | `strategy/<event>.md` | Per-event pricing/exit strategy, one file per event |
 | `handoffs/YYYY-MM-DD.md` | Session-to-session handoff notes — what happened, what's next |

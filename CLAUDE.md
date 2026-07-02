@@ -32,7 +32,7 @@ Every position gets exactly one tag:
 ## File conventions
 - Active inventory: `data/inventory.json`
 - Sold/realized: `data/sold.json`
-- Daily comp snapshots: `data/comps/YYYY-MM-DD/<event>.json`
+- Comp readings: `data/comps.json` — flat append-only log of section-floor readings (event, section, floor, comp2, comp3, source, loggedAt). Flat file rather than dated folders so the dashboard can trend a section over time without globbing.
 - Per-event strategy: `strategy/<event>.md`
 - Session handoffs: `handoffs/YYYY-MM-DD.md`
 - Dashboard app: `dashboard/`

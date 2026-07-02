@@ -25,3 +25,19 @@ export interface Position {
   clientReserved: number;
   notes: string | null;
 }
+
+// A single logged comp reading for a section, entered from the live map.
+// Append-only log — new readings are added, old ones are never mutated,
+// so trends over time are preserved.
+export interface Comp {
+  id: number;
+  event: string;
+  eventDate: string; // the event's date, matches Position.date
+  section: string;
+  floor: number; // cheapest comp in the section
+  comp2: number | null; // 2nd-cheapest
+  comp3: number | null; // 3rd-cheapest
+  source: string | null; // platform the reading came from
+  loggedAt: string; // ISO timestamp of when it was recorded
+  notes: string | null;
+}
