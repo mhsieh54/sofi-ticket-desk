@@ -35,5 +35,4 @@ LA remains the cheapest BTS market globally — 35K+ tickets available per show,
 See playbook above — raise on strength, hold through showtime, only drop 5% if stale at the 14-day mark.
 
 ## Risks
-- **⚠ Do not exceed $625/ticket** — real ARMY boycott risk above that line, per the detailed pricing note.
-- **Data conflict to resolve with Mark:** a separate roadmap note in the source data capped this at $700, not $625. These two numbers disagree by $75/ticket. Using **$625** here as the operative ceiling since it came from the more detailed per-position analysis, but this should be reconciled explicitly rather than assumed.
+- **⚠ Do not exceed $625/ticket** — real ARMY boycott risk above that line. Confirmed by Mark as the operative ceiling (a separate roadmap note had suggested $700 — that figure is superseded).

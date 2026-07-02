@@ -8,7 +8,7 @@ Full season ticket pair, Club Level Sec C135 Row 6 Seats 1-2. Total season cost 
 |---|---|---|---|---|---|---|---|
 | Saints | 2026-08-22 | 2 | $278.00 | CLIENT | — | — | Bill to company at face |
 | Giants | 2026-09-21 | 2 | $352.00 | ATTEND | — | — | MNF, attending |
-| Bills | 2026-10-12 | 2 | $477.00 | SELL | $750 | StubHub | Decision pending |
+| Bills | 2026-10-12 | 2 | $477.00 | ATTEND | — | — | Confirmed: attend, not sell |
 | Cardinals | 2026-10-18 | 2 | $333.00 | ATTEND | — | — | Lowest demand, attending |
 | Chargers | 2026-11-01 | 2 | $375.00 | ATTEND | — | — | Rivalry atmosphere, attending |
 | Packers | 2026-11-25 | 2 | $625.00 | SELL | $1,000 | StubHub | Thanksgiving Eve |
@@ -19,20 +19,18 @@ Full season ticket pair, Club Level Sec C135 Row 6 Seats 1-2. Total season cost 
 
 ## Strategy Playbook
 **SELL-RESALE**
-- Bills Oct 12: cost $477 → target $750 (StubHub) → net $638/tkt → +$161/tkt, +$322 pair, **34% ROI**
 - Packers Nov 25: cost $625 → target $1,000 (StubHub) → net $850/tkt → +$225/tkt, +$450 pair, **36% ROI**
-- Chiefs Dec 3: cost $592 → target $850 (StubHub) → net $723/tkt → +$131/tkt, +$262 pair, **22% ROI**
-- Cowboys Dec 20: cost $707 → target $1,000 (StubHub) → net $850/tkt → +$143/tkt, +$286 pair, **20% ROI**
-- Seahawks seat 2: cost $426 → target $600 (StubHub) → net $510/tkt → +$84, **~20% ROI**
+- Chiefs Dec 3: cost $592 → target $850 (StubHub) → net $723/tkt → +$131/tkt, +$262 pair, **22% ROI** (accepted below 30% floor)
+- Cowboys Dec 20: cost $707 → target $1,000 (StubHub) → net $850/tkt → +$143/tkt, +$286 pair, **20% ROI** (accepted below 30% floor)
+- Seahawks seat 2: cost $426 → target $600 (StubHub) → net $510/tkt → +$84, **~20% ROI** (accepted below 30% floor)
 
 **CLIENT/COMPANY**
 - Saints (preseason): bill at face, $278/ticket = $556 total. $14 floor confirms zero resale value — company billing is the only sensible path.
 
 **KEEP & ATTEND**
-- Giants MNF, Cardinals, Chargers, Seahawks seat 1.
+- Giants MNF, Bills MNF, Cardinals, Chargers, Seahawks seat 1. Bills was flagged decision-pending in the source data — confirmed by Mark as attend, not sell, despite the 34% ROI a sale would have cleared.
 
 **Key listing dates** (30 days out per game):
-- Sept 6 → list Bills @ $750
 - Oct 26 → list Packers @ $1,000
 - Nov 3 → list Chiefs @ $850
 - Nov 20 → list Cowboys @ $1,000
@@ -45,6 +43,5 @@ SeatGeek get-in floors, cheapest 500-level (May 11 snapshot): Saints $14, Giants
 No per-game cut ladder defined beyond initial targets. Recommend the standard timing guide as a default: list at market 14-30 days out, cut ~5% if stale at 7-14 days, price 10-15% below comp at 3-7 days, cut up to 20% inside 72 hours if still unsold.
 
 ## Risks
-- **Bills is still a decision-pending position** — the recommendation is SELL (34% ROI, real MNF demand from the Allen-vs-Stafford matchup), but this hasn't been explicitly confirmed by Mark. Don't list until confirmed.
-- **Chiefs, Cowboys, and Seahawks-sell all fall below the 30% minimum ROI rule** at their current target prices (22%, 20%, ~20% respectively). Either accept sub-target ROI on these three, or hold for better comps closer to game day — Cowboys in particular has upside given the $233 floor is the highest of the season, with room to clear $1,100+ in the run-up.
-- If all 5 SELL positions hit target: **+$1,475 projected cash profit**, plus $556 from Saints company billing — but that total assumes the three below-30%-ROI targets get accepted as-is, not renegotiated upward.
+- **Chiefs, Cowboys, and Seahawks-sell all sit below the 30% minimum ROI rule** at current target prices (22%, 20%, ~20% respectively). Confirmed accepted by Mark as capital-preservation sells rather than being renegotiated upward — Cowboys still has some upside given the $233 floor is the highest of the season, with room to clear $1,100+ in the run-up, but the target itself isn't being raised.
+- If all 4 remaining SELL positions hit target: **+$1,082 projected cash profit** (Packers $450 + Chiefs $262 + Cowboys $286 + Seahawks $84), plus $556 from Saints company billing.

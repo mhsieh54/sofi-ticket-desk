@@ -1,24 +1,23 @@
 # Bruno Mars - The Romantic Tour — 2026-10-07 (Floor)
 
 ## Overview
-1 position, Sec FL-A5 Row 6, qty 6, Floor level. True cost $653.90/ticket, $3,923.40 total invested. **Status: Held, no listing plan defined yet.**
+1 position, Sec FL-A5 Row 6, qty 6, Floor level. True cost $653.90/ticket, $3,923.40 total invested. **Status: Held, ATTEND-only — no resale plan for this event.**
 
 ## Current Holdings & Status
 | Sec | Row | Seats | Qty | Face | Category | Status |
 |---|---|---|---|---|---|---|
 | FL-A5 | 6 | — | 6 | $653.90 | CLIENT | Held |
 
-**Co-ownership: James owns 2 of 6 tickets. Mark's 4 of 6 are personal (ATTEND intent).**
+**Co-ownership confirmed: James owns 2 of 6 tickets, keeps/attends his own — no resale, no proceeds split needed on his portion. Mark's 4 of 6 are also ATTEND.** Category remains CLIENT (rather than switching to plain ATTEND) to keep the co-ownership flagged for accounting purposes, since James's share was co-purchased and isn't fully Mark's capital.
 
 ## Strategy Playbook
-No pricing or listing plan has been defined for this position yet — it wasn't covered in prior session notes. Needs a real strategy pass before comps firm up closer to the date.
+None needed — this is a full ATTEND position for both parties. No listing, no target pricing, no platform selection required.
 
 ## Market Context
-Floor-level seats for a tour that's broken attendance records (see Sep 30 sibling event: SoFi averaging $500-600/ticket resale, tour-wide floor $200-300). No Oct 7-specific comps pulled yet.
+N/A for resale purposes. For reference, the Sep 30 sibling event at SoFi (see [bruno-mars-sep-30.md](./bruno-mars-sep-30.md)) sold in a market averaging $500-600/ticket resale — but that's not relevant here since none of these 6 seats are for sale.
 
 ## Escalation Plan
-Not yet defined — pending a strategy session.
+N/A — not a sell position.
 
 ## Risks
-- **Co-ownership settlement is undefined.** Need explicit agreement with James on his 2 tickets: does he keep/attend, or does Mark handle resale and split/reimburse proceeds? This should be resolved well before the event, not last-minute.
-- No comps or target pricing exist yet for this specific date — treat any near-term pricing decision as provisional until comps are pulled.
+None outstanding. Co-ownership arrangement with James is settled: both parties attend their own share, no reimbursement or resale coordination required.
