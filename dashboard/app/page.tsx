@@ -12,6 +12,14 @@ const CATEGORY_COLOR: Record<string, string> = {
   KEEP: "#4ade80",
 };
 
+const PLATFORM_COLOR: Record<string, string> = {
+  StubHub: "#00D4AA",
+  "Vivid Seats": "#9B59B6",
+  TickPick: "#F97316",
+  Ticketmaster: "#006BE6",
+  Direct: "#4ade80",
+};
+
 function daysUntil(dateStr: string): number {
   const now = new Date();
   const target = new Date(dateStr + "T00:00:00");
@@ -33,6 +41,68 @@ function urgencyLabel(days: number): string {
   return `${days}d — hold`;
 }
 
+function shortEventTag(event: string, date: string): string {
+  const short = event.split(" - ")[0].split(" (")[0];
+  const d = new Date(date + "T00:00:00");
+  const monthDay = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  return `${short} ${monthDay}`;
+}
+
+function monthLabel(m: string): string {
+  const [y, mo] = m.split("-").map(Number);
+  return new Date(y, mo - 1, 1)
+    .toLocaleDateString("en-US", { month: "long", year: "numeric" })
+    .toUpperCase();
+}
+
+function shiftMonth(m: string, n: number): string {
+  const [y, mo] = m.split("-").map(Number);
+  const d = new Date(y, mo - 1 + n, 1);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+}
+
+interface TimelineItem {
+  date: string;
+  month: string;
+  eventTag: string;
+  text: string;
+  color: string;
+}
+
+// Built from live data (targetSellDate / event date), not hand-maintained —
+// only SELL positions with a target and CLIENT positions needing billing
+// generate an action; ATTEND/KEEP need no action so they're excluded.
+function buildTimeline(inventory: Position[]): TimelineItem[] {
+  const items: TimelineItem[] = [];
+  for (const p of inventory) {
+    if (p.category === "SELL" && p.targetSellDate) {
+      items.push({
+        date: p.targetSellDate,
+        month: p.targetSellDate.slice(0, 7),
+        eventTag: shortEventTag(p.event, p.date),
+        text:
+          p.status === "listed"
+            ? `Listed on ${p.platform} @ $${p.ask} — monitor and cut if stale`
+            : `List ${p.event} — target $${p.targetAsk} on ${p.targetPlatform}`,
+        color: CATEGORY_COLOR.SELL,
+      });
+    }
+    if (p.category === "CLIENT" && !p.sold) {
+      items.push({
+        date: p.date,
+        month: p.date.slice(0, 7),
+        eventTag: shortEventTag(p.event, p.date),
+        text: `Bill company for ${p.event} — $${((p.fmv ?? p.face) * p.qty).toFixed(0)}`,
+        color: CATEGORY_COLOR.CLIENT,
+      });
+    }
+  }
+  items.sort((a, b) => a.date.localeCompare(b.date));
+  return items;
+}
+
+type Tab = "overview" | "inventory" | "football";
+
 export default function DashboardPage() {
   const [inventory, setInventory] = useState<Position[] | null>(null);
   const [sold, setSold] = useState<Position[] | null>(null);
@@ -41,6 +111,7 @@ export default function DashboardPage() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [sellingId, setSellingId] = useState<number | null>(null);
   const [showSold, setShowSold] = useState(false);
+  const [tab, setTab] = useState<Tab>("overview");
   const router = useRouter();
 
   async function load() {
@@ -92,94 +163,145 @@ export default function DashboardPage() {
     return s + (netPayout(p.targetAsk, p.targetPlatform) - p.face) * p.qty;
   }, 0);
 
-  const groups = new Map<string, Position[]>();
-  for (const p of inventory) {
-    const key = `${p.event}|${p.date}`;
-    if (!groups.has(key)) groups.set(key, []);
-    groups.get(key)!.push(p);
+  const totalActiveQty = inventory.reduce((s, p) => s + p.qty, 0);
+  const totalInvested = inventory.reduce((s, p) => s + p.face * p.qty, 0);
+
+  const sortedInventory = [...inventory].sort((a, b) => a.date.localeCompare(b.date));
+  const footballPositions = sortedInventory.filter((p) => p.event.startsWith("Rams"));
+  const timeline = buildTimeline(inventory);
+
+  function editHandlers(p: Position) {
+    return {
+      editing: editingId === p.id,
+      selling: sellingId === p.id,
+      onEdit: () => setEditingId(editingId === p.id ? null : p.id),
+      onSell: () => setSellingId(sellingId === p.id ? null : p.id),
+      onSaveEdit: async (updates: Partial<Position>) => {
+        if (await patchPosition(p.id, { updates })) setEditingId(null);
+      },
+      onSaveSell: async (payload: { soldPrice: number; platform: string; soldDate: string }) => {
+        if (await patchPosition(p.id, { action: "markSold", ...payload })) setSellingId(null);
+      },
+    };
   }
-  const sortedGroups = Array.from(groups.entries()).sort((a, b) => a[1][0].date.localeCompare(b[1][0].date));
 
   return (
     <div className="page">
       <header className="header">
-        <div className="brand">SoFi Ticket Desk</div>
-        <button className="btn-ghost" onClick={logout}>Log out</button>
+        <div className="header-left">
+          <div className="logo-mark">S</div>
+          <div>
+            <div className="brand-title">SoFi Ticket Desk</div>
+            <div className="brand-sub">Daily Manager · Mark</div>
+          </div>
+        </div>
+        <div className="header-right">
+          <div className="header-date">
+            {new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" })}
+          </div>
+          <button className="btn-ghost" onClick={logout}>Log out</button>
+        </div>
       </header>
 
-      {error && <div className="banner-error">{error}</div>}
+      <nav className="tabs">
+        <button className={`tab-btn ${tab === "overview" ? "active" : ""}`} onClick={() => setTab("overview")}>Overview</button>
+        <button className={`tab-btn ${tab === "inventory" ? "active" : ""}`} onClick={() => setTab("inventory")}>Inventory</button>
+        <button className={`tab-btn ${tab === "football" ? "active" : ""}`} onClick={() => setTab("football")}>Football</button>
+      </nav>
 
-      <div className="stats">
-        <StatCard label="For Sale" value={String(forSaleQty)} sub={`${activeSell.length} positions`} />
-        <StatCard label="Capital In" value={`$${capitalIn.toLocaleString()}`} />
-        <StatCard label="Personal Keep" value={String(keepQty)} accent="#60a5fa" />
-        <StatCard
-          label="Realized P&L"
-          value={`$${realizedProfit.toFixed(0)}`}
-          accent={realizedProfit >= 0 ? "#4ade80" : "#f87171"}
-          sub={`${sold.length} sold`}
-        />
-        <StatCard label="Projected P&L" value={`$${projectedProfit.toFixed(0)}`} accent="#F0C040" sub="if targets hit" />
-      </div>
+      <div className="page-inner">
+        {error && <div className="banner-error">{error}</div>}
 
-      <div className="groups">
-        {sortedGroups.map(([key, positions]) => {
-          const [event, date] = key.split("|");
-          const days = daysUntil(date);
-          return (
-            <div key={key} className="event-card">
-              <div className="event-header">
-                <div>
-                  <div className="event-name">{event}</div>
-                  <div className="event-meta">
-                    {date} · {positions.reduce((s, p) => s + p.qty, 0)} tickets
-                  </div>
-                </div>
-                <div className="urgency" style={{ color: urgencyColor(days) }}>
-                  {urgencyLabel(days)}
-                </div>
-              </div>
-              {positions.map((p) => (
-                <PositionRow
-                  key={p.id}
-                  p={p}
-                  editing={editingId === p.id}
-                  selling={sellingId === p.id}
-                  onEdit={() => setEditingId(editingId === p.id ? null : p.id)}
-                  onSell={() => setSellingId(sellingId === p.id ? null : p.id)}
-                  onSaveEdit={async (updates) => {
-                    if (await patchPosition(p.id, { updates })) setEditingId(null);
-                  }}
-                  onSaveSell={async (payload) => {
-                    if (await patchPosition(p.id, { action: "markSold", ...payload })) setSellingId(null);
-                  }}
-                />
-              ))}
+        {tab === "overview" && (
+          <div>
+            <div className="greeting-title">Good morning, Mark.</div>
+            <div className="greeting-sub">
+              {totalActiveQty} tickets active · ${totalInvested.toLocaleString(undefined, { maximumFractionDigits: 0 })} invested · $
+              {realizedProfit.toFixed(0)} realized P&L
             </div>
-          );
-        })}
-      </div>
 
-      <div className="sold-toggle" onClick={() => setShowSold(!showSold)}>
-        {showSold ? "▾" : "▸"} Sold positions ({sold.length}) — ${realizedProfit.toFixed(0)} realized
-      </div>
-      {showSold && (
-        <div className="sold-list">
-          {sold.map((p) => {
-            const profit = ((p.soldPayout ?? 0) - p.face) * p.qty;
-            return (
-              <div key={p.id} className="sold-row">
-                <span>{p.event} — {p.date}</span>
-                <span>Sec {p.section} Row {p.row} · {p.qty}x</span>
-                <span>{p.platform} @ ${p.ask}</span>
-                <span style={{ color: profit >= 0 ? "#4ade80" : "#f87171" }}>
-                  {profit >= 0 ? "+" : ""}${profit.toFixed(0)}
+            <div className="stats">
+              <StatCard label="For Sale" value={String(forSaleQty)} sub={`${activeSell.length} positions`} />
+              <StatCard label="Capital In" value={`$${capitalIn.toLocaleString(undefined, { maximumFractionDigits: 0 })}`} sub="resale inventory" />
+              <StatCard label="Personal Keep" value={String(keepQty)} accent="#60a5fa" />
+              <StatCard
+                label="Realized P&L"
+                value={`$${realizedProfit.toFixed(0)}`}
+                accent={realizedProfit >= 0 ? "#4ade80" : "#f87171"}
+                sub={`${sold.length} sold`}
+              />
+              <StatCard label="Projected P&L" value={`$${projectedProfit.toFixed(0)}`} accent="#F0C040" sub="if targets hit" />
+            </div>
+
+            <div className="roadmap-heading">Monthly Action Roadmap</div>
+            <MonthlyRoadmap items={timeline} />
+          </div>
+        )}
+
+        {tab === "inventory" && (
+          <div>
+            <div className="page-title">Inventory</div>
+            <div className="page-subtitle">All active holdings, organized by date. Face = true cost including all fees.</div>
+            <div className="list-panel">
+              <div className="list-panel-header">
+                <span className="list-panel-label">Active ({inventory.length})</span>
+                <span className="list-panel-counts">
+                  Sell: <span style={{ color: CATEGORY_COLOR.SELL }}>{activeSell.length}</span> · Attend:{" "}
+                  <span style={{ color: CATEGORY_COLOR.ATTEND }}>{inventory.filter((p) => p.category === "ATTEND").length}</span> · Client:{" "}
+                  <span style={{ color: CATEGORY_COLOR.CLIENT }}>{inventory.filter((p) => p.category === "CLIENT").length}</span> · Keep:{" "}
+                  <span style={{ color: CATEGORY_COLOR.KEEP }}>{inventory.filter((p) => p.category === "KEEP").length}</span>
                 </span>
               </div>
-            );
-          })}
-        </div>
-      )}
+              {sortedInventory.map((p) => (
+                <TicketRow key={p.id} p={p} {...editHandlers(p)} />
+              ))}
+            </div>
+
+            <div className="sold-toggle" onClick={() => setShowSold(!showSold)}>
+              {showSold ? "▾" : "▸"} Sold positions ({sold.length}) — ${realizedProfit.toFixed(0)} realized
+            </div>
+            {showSold && (
+              <div className="sold-list">
+                {sold.map((p) => {
+                  const profit = ((p.soldPayout ?? 0) - p.face) * p.qty;
+                  return (
+                    <div key={p.id} className="sold-row">
+                      <span>{p.event} — {p.date}</span>
+                      <span>Sec {p.section} Row {p.row} · {p.qty}x</span>
+                      <span>{p.platform} @ ${p.ask}</span>
+                      <span style={{ color: profit >= 0 ? "#4ade80" : "#f87171" }}>
+                        {profit >= 0 ? "+" : ""}${profit.toFixed(0)}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
+        {tab === "football" && (
+          <div>
+            <div className="page-title">Football</div>
+            <div className="page-subtitle">Rams 2026 Season — Sec C135 Row 6, Club Level.</div>
+            <div className="list-panel">
+              <div className="list-panel-header">
+                <span className="list-panel-label">Rams Positions ({footballPositions.length})</span>
+                <span className="list-panel-counts">
+                  Sell: <span style={{ color: CATEGORY_COLOR.SELL }}>{footballPositions.filter((p) => p.category === "SELL").length}</span> · Attend:{" "}
+                  <span style={{ color: CATEGORY_COLOR.ATTEND }}>{footballPositions.filter((p) => p.category === "ATTEND").length}</span> · Client:{" "}
+                  <span style={{ color: CATEGORY_COLOR.CLIENT }}>{footballPositions.filter((p) => p.category === "CLIENT").length}</span>
+                </span>
+              </div>
+              {footballPositions.length === 0 ? (
+                <div className="roadmap-empty">No football positions found.</div>
+              ) : (
+                footballPositions.map((p) => <TicketRow key={p.id} p={p} {...editHandlers(p)} />)
+              )}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -194,7 +316,55 @@ function StatCard({ label, value, sub, accent }: { label: string; value: string;
   );
 }
 
-function PositionRow({
+function MonthlyRoadmap({ items }: { items: TimelineItem[] }) {
+  const nowMonth = new Date().toISOString().slice(0, 7);
+  const groups = new Map<string, TimelineItem[]>();
+  for (const it of items) {
+    if (!groups.has(it.month)) groups.set(it.month, []);
+    groups.get(it.month)!.push(it);
+  }
+  const earliestVisible = shiftMonth(nowMonth, -1);
+  const months = Array.from(groups.keys())
+    .filter((m) => m >= earliestVisible)
+    .sort();
+
+  if (months.length === 0) {
+    return <div className="roadmap-empty">No upcoming pricing or billing actions in the data.</div>;
+  }
+
+  return (
+    <div className="roadmap">
+      {months.map((m) => {
+        const isCurrent = m === nowMonth;
+        const isPast = m < nowMonth;
+        return (
+          <div key={m} className={`roadmap-month ${isCurrent ? "current" : ""} ${isPast ? "past" : ""}`}>
+            <div className="roadmap-month-header">
+              <span className="roadmap-month-name">{isCurrent ? "▶ " : ""}{monthLabel(m)}</span>
+              {isCurrent && <span className="roadmap-tag now">NOW</span>}
+              {isPast && <span className="roadmap-tag overdue">OVERDUE</span>}
+            </div>
+            <div className="roadmap-items">
+              {groups.get(m)!.map((it, i) => (
+                <div key={i} className="roadmap-item">
+                  <span
+                    className="roadmap-item-badge"
+                    style={{ background: it.color + "22", color: it.color, border: `1px solid ${it.color}44` }}
+                  >
+                    {it.eventTag}
+                  </span>
+                  <span className="roadmap-item-text">{it.text}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function TicketRow({
   p,
   editing,
   selling,
@@ -221,32 +391,70 @@ function PositionRow({
   const [soldPlatform, setSoldPlatform] = useState(p.targetPlatform || p.platform || "StubHub");
   const [soldDate, setSoldDate] = useState(new Date().toISOString().slice(0, 10));
 
+  const days = daysUntil(p.date);
+  const netInfo =
+    p.status === "sold" && p.soldPayout != null
+      ? { profit: (p.soldPayout - p.face) * p.qty, roi: ((p.soldPayout - p.face) / p.face) * 100 }
+      : p.ask != null
+      ? { profit: (netPayout(p.ask, p.platform) - p.face) * p.qty, roi: ((netPayout(p.ask, p.platform) - p.face) / p.face) * 100 }
+      : null;
+
   return (
-    <div className="position-row">
-      <div className="position-main">
+    <div className="ticket-row">
+      <div className="ticket-main">
+        <div className="ticket-event">
+          {p.event}
+          <span
+            className="badge"
+            style={{
+              background: CATEGORY_COLOR[p.category] + "22",
+              color: CATEGORY_COLOR[p.category],
+              border: `1px solid ${CATEGORY_COLOR[p.category]}44`,
+            }}
+          >
+            {p.category}
+          </span>
+        </div>
+        <div className="ticket-meta">
+          Sec {p.section} · Row {p.row} · Seats {p.seats} · {p.qty}x · {p.date}
+        </div>
+      </div>
+
+      <span className="ticket-figure">Cost: <strong>${p.face.toFixed(0)}</strong></span>
+      {p.ask != null && <span className="ticket-figure">Ask: <strong style={{ color: "#F0C040" }}>${p.ask}</strong></span>}
+      {p.platform && (
         <span
-          className="badge"
+          className="badge-platform"
           style={{
-            background: CATEGORY_COLOR[p.category] + "22",
-            color: CATEGORY_COLOR[p.category],
-            border: `1px solid ${CATEGORY_COLOR[p.category]}44`,
+            background: (PLATFORM_COLOR[p.platform] || "#5a6478") + "22",
+            color: PLATFORM_COLOR[p.platform] || "#5a6478",
+            border: `1px solid ${(PLATFORM_COLOR[p.platform] || "#5a6478")}44`,
           }}
         >
-          {p.category}
+          {p.platform}
         </span>
-        <span className="position-loc">Sec {p.section} · Row {p.row} · Seats {p.seats} · {p.qty}x</span>
-        <span className="position-cost">${p.face.toFixed(2)}/tkt</span>
-        {p.platform && <span className="position-platform">{p.platform} @ ${p.ask}</span>}
-        {p.targetAsk && <span className="position-target">target ${p.targetAsk} ({p.targetPlatform})</span>}
-        <span className="position-status">{p.status}</span>
-      </div>
-      {p.notes && <div className="position-notes">{p.notes}</div>}
+      )}
+      {netInfo && (
+        <span className="ticket-figure">
+          Net: <strong style={{ color: netInfo.profit >= 0 ? "#4ade80" : "#f87171" }}>
+            {netInfo.profit >= 0 ? "+" : ""}${netInfo.profit.toFixed(0)} ({netInfo.roi.toFixed(0)}% ROI)
+          </strong>
+        </span>
+      )}
+      {p.status !== "sold" && (
+        <span className="ticket-urgency" style={{ color: urgencyColor(days) }}>{urgencyLabel(days)}</span>
+      )}
+      <span className="ticket-status">{p.status}</span>
+
       {p.category === "SELL" && p.status !== "sold" && (
-        <div className="position-actions">
+        <div className="ticket-actions">
           <button className="btn-small" onClick={onEdit}>{editing ? "Cancel" : "Edit"}</button>
           <button className="btn-small btn-sell" onClick={onSell}>{selling ? "Cancel" : "Mark Sold"}</button>
         </div>
       )}
+
+      {p.notes && <div className="ticket-notes">{p.notes}</div>}
+
       {editing && (
         <div className="edit-form">
           <label>Platform<input value={platform} onChange={(e) => setPlatform(e.target.value)} placeholder="StubHub" /></label>
@@ -271,6 +479,7 @@ function PositionRow({
           </button>
         </div>
       )}
+
       {selling && (
         <div className="edit-form">
           <label>Sold Price<input value={soldPrice} onChange={(e) => setSoldPrice(e.target.value)} /></label>
