@@ -41,6 +41,22 @@ function urgencyLabel(days: number): string {
   return `${days}d — hold`;
 }
 
+// Annualized return: (payout/cost)^(365/days) - 1. Same methodology as the
+// original React artifact's IRR calc — projects a short holding period's
+// return out to a full year so positions of different durations compare.
+function calcIRR(cost: number, payout: number, days: number): number {
+  if (!cost || !days || days <= 0 || payout <= 0) return 0;
+  const ratio = payout / cost;
+  if (ratio <= 0) return 0;
+  return Math.pow(ratio, 365 / days) - 1;
+}
+
+function fmtPct(fraction: number): string {
+  if (!isFinite(fraction)) return "—";
+  const pct = fraction * 100;
+  return `${pct.toLocaleString("en-US", { maximumFractionDigits: 0 })}%`;
+}
+
 function shortEventTag(event: string, date: string): string {
   const short = event.split(" - ")[0].split(" (")[0];
   const d = new Date(date + "T00:00:00");
@@ -174,6 +190,42 @@ export default function DashboardPage() {
   const soldROI = soldTotalCost > 0 ? (realizedProfit / soldTotalCost) * 100 : 0;
   const sortedSold = [...sold].sort((a, b) => (b.soldDate || "").localeCompare(a.soldDate || ""));
 
+  // Simple ROI on realized trades — more honest than annualizing a short
+  // hold, so this one stays un-annualized (matches the original artifact).
+  const realizedROI = soldTotalCost > 0 ? realizedProfit / soldTotalCost : 0;
+
+  // Cost-weighted blended IRR, annualized, for closed positions.
+  const realizedIRR = (() => {
+    let weightedIRR = 0;
+    let totalCostWeight = 0;
+    sold.forEach((p) => {
+      if (!p.purchaseDate || !p.soldDate || p.soldPayout == null) return;
+      const cost = p.face * p.qty;
+      const payout = p.soldPayout * p.qty;
+      const days = Math.max(1, (new Date(p.soldDate).getTime() - new Date(p.purchaseDate).getTime()) / 86400000);
+      weightedIRR += calcIRR(cost, payout, days) * cost;
+      totalCostWeight += cost;
+    });
+    return totalCostWeight > 0 ? weightedIRR / totalCostWeight : 0;
+  })();
+
+  // Cost-weighted blended IRR, annualized, for active SELL positions with a
+  // defined target — projects the return if every target sale lands on its
+  // targetSellDate.
+  const projectedIRR = (() => {
+    let weightedIRR = 0;
+    let totalCostWeight = 0;
+    activeSell.forEach((p) => {
+      if (!p.targetAsk || !p.targetPlatform || !p.purchaseDate || !p.targetSellDate) return;
+      const cost = p.face * p.qty;
+      const payout = netPayout(p.targetAsk, p.targetPlatform) * p.qty;
+      const days = Math.max(1, (new Date(p.targetSellDate).getTime() - new Date(p.purchaseDate).getTime()) / 86400000);
+      weightedIRR += calcIRR(cost, payout, days) * cost;
+      totalCostWeight += cost;
+    });
+    return totalCostWeight > 0 ? weightedIRR / totalCostWeight : 0;
+  })();
+
   function editHandlers(p: Position) {
     return {
       editing: editingId === p.id,
@@ -233,9 +285,18 @@ export default function DashboardPage() {
                 label="Realized P&L"
                 value={`$${realizedProfit.toFixed(0)}`}
                 accent={realizedProfit >= 0 ? "#4ade80" : "#f87171"}
+                rate={fmtPct(realizedROI)}
+                rateLabel="ROI"
                 sub={`${sold.length} sold`}
               />
-              <StatCard label="Projected P&L" value={`$${projectedProfit.toFixed(0)}`} accent="#F0C040" sub="if targets hit" />
+              <StatCard
+                label="Projected P&L"
+                value={`$${projectedProfit.toFixed(0)}`}
+                accent="#F0C040"
+                rate={fmtPct(projectedIRR)}
+                rateLabel="IRR"
+                sub="if targets hit"
+              />
             </div>
 
             <div className="roadmap-heading">Monthly Action Roadmap</div>
@@ -296,11 +357,20 @@ export default function DashboardPage() {
                 label="Realized P&L"
                 value={`$${realizedProfit.toFixed(0)}`}
                 accent={realizedProfit >= 0 ? "#4ade80" : "#f87171"}
+                rate={fmtPct(realizedROI)}
+                rateLabel="ROI"
                 sub={`${sold.length} sold`}
               />
               <StatCard label="Total Cost" value={`$${soldTotalCost.toLocaleString(undefined, { maximumFractionDigits: 0 })}`} />
               <StatCard label="Total Payout" value={`$${soldTotalPayout.toLocaleString(undefined, { maximumFractionDigits: 0 })}`} accent="#60a5fa" />
-              <StatCard label="Blended ROI" value={`${soldROI.toFixed(0)}%`} accent="#F0C040" />
+              <StatCard
+                label="Blended ROI"
+                value={`${soldROI.toFixed(0)}%`}
+                accent="#F0C040"
+                rate={fmtPct(realizedIRR)}
+                rateLabel="Annualized IRR"
+                sub="simple ROI · annualized rate"
+              />
             </div>
 
             <div className="list-panel">
@@ -320,11 +390,30 @@ export default function DashboardPage() {
   );
 }
 
-function StatCard({ label, value, sub, accent }: { label: string; value: string; sub?: string; accent?: string }) {
+function StatCard({
+  label,
+  value,
+  sub,
+  accent,
+  rate,
+  rateLabel,
+}: {
+  label: string;
+  value: string;
+  sub?: string;
+  accent?: string;
+  rate?: string;
+  rateLabel?: string;
+}) {
   return (
     <div className="stat-card">
       <div className="stat-label">{label}</div>
       <div className="stat-value" style={{ color: accent || "#F0C040" }}>{value}</div>
+      {rate && (
+        <div className="stat-rate" style={{ color: accent || "#F0C040" }}>
+          {rateLabel || "Rate"}: {rate}
+        </div>
+      )}
       {sub && <div className="stat-sub">{sub}</div>}
     </div>
   );

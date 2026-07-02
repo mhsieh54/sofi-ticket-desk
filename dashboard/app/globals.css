@@ -205,6 +205,13 @@ input::placeholder, textarea::placeholder { color: #2e3545; }
   font-weight: 800;
   line-height: 1;
 }
+.stat-rate {
+  font-size: 13px;
+  font-weight: 700;
+  font-family: monospace;
+  margin-top: 6px;
+  opacity: 0.85;
+}
 .stat-sub { color: #5a6478; font-size: 11px; margin-top: 4px; }
 
 /* Monthly roadmap */
