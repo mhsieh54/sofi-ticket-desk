@@ -1,0 +1,8 @@
+{
+  "name": "sofi-ticket-desk",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix dashboard run dev",
+    "build": "npm --prefix dashboard run build"
+  }
+}
