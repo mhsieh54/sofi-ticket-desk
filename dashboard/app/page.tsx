@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { PLATFORM_FEES, netPayout } from "@/lib/fees";
-import type { Position, Comp } from "@/lib/types";
+import type { Position, Comp, Brief } from "@/lib/types";
 
 // Your ask is flagged DROP when it sits more than this above the section
 // floor — straight from the CLAUDE.md morning-brief rule (>10% above floor).
@@ -129,12 +129,13 @@ function buildTimeline(inventory: Position[]): TimelineItem[] {
   return items;
 }
 
-type Tab = "overview" | "inventory" | "football" | "comps" | "sold";
+type Tab = "overview" | "inventory" | "football" | "comps" | "brief" | "sold";
 
 export default function DashboardPage() {
   const [inventory, setInventory] = useState<Position[] | null>(null);
   const [sold, setSold] = useState<Position[] | null>(null);
   const [comps, setComps] = useState<Comp[]>([]);
+  const [briefs, setBriefs] = useState<Brief[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -144,12 +145,18 @@ export default function DashboardPage() {
 
   async function load() {
     setLoading(true);
-    const [posRes, compRes] = await Promise.all([fetch("/api/positions"), fetch("/api/comps")]);
+    const [posRes, compRes, briefRes] = await Promise.all([
+      fetch("/api/positions"),
+      fetch("/api/comps"),
+      fetch("/api/briefs"),
+    ]);
     const posData = await posRes.json();
     const compData = await compRes.json();
+    const briefData = await briefRes.json();
     setInventory(posData.inventory || []);
     setSold(posData.sold || []);
     setComps(compData.comps || []);
+    setBriefs(briefData.briefs || []);
     setLoading(false);
   }
 
@@ -281,6 +288,7 @@ export default function DashboardPage() {
         <button className={`tab-btn ${tab === "inventory" ? "active" : ""}`} onClick={() => setTab("inventory")}>Inventory</button>
         <button className={`tab-btn ${tab === "football" ? "active" : ""}`} onClick={() => setTab("football")}>Football</button>
         <button className={`tab-btn ${tab === "comps" ? "active" : ""}`} onClick={() => setTab("comps")}>Comps</button>
+        <button className={`tab-btn ${tab === "brief" ? "active" : ""}`} onClick={() => setTab("brief")}>Brief</button>
         <button className={`tab-btn ${tab === "sold" ? "active" : ""}`} onClick={() => setTab("sold")}>Sold</button>
       </nav>
 
@@ -373,6 +381,16 @@ export default function DashboardPage() {
               <span style={{ color: "#f87171" }}>DROP</span> on Inventory when it&apos;s more than 10% above the latest floor.
             </div>
             <CompsTab positions={activeSell} comps={comps} onLog={logComp} />
+          </div>
+        )}
+
+        {tab === "brief" && (
+          <div>
+            <div className="page-title">Market Brief</div>
+            <div className="page-subtitle">
+              Directional market read from the scheduled agent (Mon/Wed/Fri). Not exact floors — those live in Comps.
+            </div>
+            <BriefTab briefs={briefs} />
           </div>
         )}
 
@@ -836,4 +854,107 @@ function CompsTab({
       </div>
     </div>
   );
+}
+
+function BriefTab({ briefs }: { briefs: Brief[] }) {
+  const [selected, setSelected] = useState(0);
+
+  if (briefs.length === 0) {
+    return (
+      <div className="list-panel">
+        <div className="roadmap-empty">
+          No briefs yet. The scheduled agent writes one Mon/Wed/Fri (once the ANTHROPIC_API_KEY secret is set), or run it
+          on demand from the repo&apos;s Actions tab.
+        </div>
+      </div>
+    );
+  }
+
+  const brief = briefs[selected];
+
+  return (
+    <div>
+      {briefs.length > 1 && (
+        <div className="comp-form" style={{ marginBottom: 16 }}>
+          <label>
+            Brief date
+            <select value={selected} onChange={(e) => setSelected(Number(e.target.value))}>
+              {briefs.map((b, i) => (
+                <option key={b.date} value={i}>{b.date}{i === 0 ? " (latest)" : ""}</option>
+              ))}
+            </select>
+          </label>
+        </div>
+      )}
+      <div className="brief-panel">
+        <Markdown text={brief.content} />
+      </div>
+    </div>
+  );
+}
+
+// Minimal, dependency-free markdown renderer for the brief format the agent
+// produces: #/##/### headings, - / * list items, **bold**, and [text](url)
+// links. Anything else renders as a plain paragraph. No raw HTML is ever
+// injected — links are built as real <a> elements, so this is XSS-safe even
+// though brief content is model-generated.
+function renderInline(text: string, keyBase: string): ReactNode[] {
+  const nodes: ReactNode[] = [];
+  // Matches [text](url) or **bold**
+  const re = /\[([^\]]+)\]\(([^)]+)\)|\*\*([^*]+)\*\*/g;
+  let last = 0;
+  let m: RegExpExecArray | null;
+  let i = 0;
+  while ((m = re.exec(text)) !== null) {
+    if (m.index > last) nodes.push(text.slice(last, m.index));
+    if (m[1] !== undefined && /^https?:\/\//.test(m[2])) {
+      nodes.push(
+        <a key={`${keyBase}-${i}`} href={m[2]} target="_blank" rel="noopener noreferrer">
+          {m[1]}
+        </a>
+      );
+    } else if (m[1] !== undefined) {
+      // Non-http link target — render the visible text only, drop the URL.
+      nodes.push(m[1]);
+    } else {
+      nodes.push(<strong key={`${keyBase}-${i}`}>{m[3]}</strong>);
+    }
+    last = re.lastIndex;
+    i++;
+  }
+  if (last < text.length) nodes.push(text.slice(last));
+  return nodes;
+}
+
+function Markdown({ text }: { text: string }) {
+  const lines = text.split("\n");
+  const out: ReactNode[] = [];
+  let list: ReactNode[] | null = null;
+
+  const flushList = (key: string) => {
+    if (list) {
+      out.push(<ul key={key} className="md-ul">{list}</ul>);
+      list = null;
+    }
+  };
+
+  lines.forEach((line, idx) => {
+    const key = `l${idx}`;
+    const listItem = line.match(/^\s*[-*]\s+(.*)$/);
+    if (listItem) {
+      if (!list) list = [];
+      list.push(<li key={key}>{renderInline(listItem[1], key)}</li>);
+      return;
+    }
+    flushList(`ul${idx}`);
+
+    if (/^###\s+/.test(line)) out.push(<h4 key={key} className="md-h4">{renderInline(line.replace(/^###\s+/, ""), key)}</h4>);
+    else if (/^##\s+/.test(line)) out.push(<h3 key={key} className="md-h3">{renderInline(line.replace(/^##\s+/, ""), key)}</h3>);
+    else if (/^#\s+/.test(line)) out.push(<h2 key={key} className="md-h2">{renderInline(line.replace(/^#\s+/, ""), key)}</h2>);
+    else if (line.trim() === "") out.push(<div key={key} className="md-gap" />);
+    else out.push(<p key={key} className="md-p">{renderInline(line, key)}</p>);
+  });
+  flushList("ul-end");
+
+  return <>{out}</>;
 }

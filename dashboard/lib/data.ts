@@ -1,6 +1,6 @@
 import { readFile } from "fs/promises";
 import path from "path";
-import type { Position, Comp } from "./types";
+import type { Position, Comp, Brief } from "./types";
 
 // Reads from the local dashboard/data/ copy, synced from the project root's
 // data/ by scripts/sync-data.js (see predev/prebuild in package.json).
@@ -19,6 +19,18 @@ export async function readComps(): Promise<Comp[]> {
   try {
     const raw = await readFile(filePath, "utf-8");
     return JSON.parse(raw).entries ?? [];
+  } catch {
+    return [];
+  }
+}
+
+// Reads the consolidated briefs.json (built by sync-data.js from
+// data/briefs/*.md). Already sorted newest-first.
+export async function readBriefs(): Promise<Brief[]> {
+  const filePath = path.join(DATA_DIR, "briefs.json");
+  try {
+    const raw = await readFile(filePath, "utf-8");
+    return JSON.parse(raw).briefs ?? [];
   } catch {
     return [];
   }

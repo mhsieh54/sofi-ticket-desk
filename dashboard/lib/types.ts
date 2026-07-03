@@ -41,3 +41,9 @@ export interface Comp {
   loggedAt: string; // ISO timestamp of when it was recorded
   notes: string | null;
 }
+
+// A dated market-narrative brief written by the scheduled agent.
+export interface Brief {
+  date: string; // YYYY-MM-DD, from the filename
+  content: string; // raw markdown
+}

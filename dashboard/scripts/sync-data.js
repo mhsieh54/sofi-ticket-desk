@@ -19,4 +19,22 @@ for (const file of ["inventory.json", "sold.json", "comps.json"]) {
   }
   fs.copyFileSync(src, path.join(DEST, file));
 }
-console.log("Synced inventory.json, sold.json, comps.json into dashboard/data/");
+
+// Consolidate the market briefs (data/briefs/*.md) into a single JSON file the
+// app reads — one proven read path (like comps.json), no runtime directory
+// scanning or cross-root file tracing.
+const briefsSrc = path.join(SRC, "briefs");
+const briefs = [];
+if (fs.existsSync(briefsSrc)) {
+  for (const name of fs.readdirSync(briefsSrc)) {
+    if (!name.endsWith(".md")) continue;
+    briefs.push({
+      date: name.replace(/\.md$/, ""),
+      content: fs.readFileSync(path.join(briefsSrc, name), "utf-8"),
+    });
+  }
+}
+briefs.sort((a, b) => b.date.localeCompare(a.date)); // newest first
+fs.writeFileSync(path.join(DEST, "briefs.json"), JSON.stringify({ briefs }, null, 2) + "\n");
+
+console.log(`Synced inventory.json, sold.json, comps.json, and ${briefs.length} brief(s) into dashboard/data/`);

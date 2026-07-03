@@ -468,6 +468,41 @@ input::placeholder, textarea::placeholder { color: #2e3545; }
 }
 .comp-history-row span:first-child { color: #5a6478; min-width: 46px; }
 
+/* Market brief */
+.brief-panel {
+  background: #111418;
+  border: 1px solid #1e2530;
+  border-radius: 10px;
+  padding: 20px 24px;
+}
+.md-h2 {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 20px;
+  color: #F0C040;
+  margin: 4px 0 10px;
+}
+.md-h3 {
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-family: monospace;
+  color: #F0C040;
+  margin: 20px 0 8px;
+}
+.md-h4 {
+  font-size: 13px;
+  font-weight: 700;
+  color: #cdd6f4;
+  margin: 14px 0 4px;
+}
+.md-p { color: #a8b3cf; font-size: 13px; line-height: 1.6; margin: 6px 0; }
+.md-ul { margin: 6px 0; padding-left: 20px; }
+.md-ul li { color: #a8b3cf; font-size: 13px; line-height: 1.6; margin: 3px 0; }
+.md-gap { height: 6px; }
+.brief-panel strong { color: #cdd6f4; }
+.brief-panel a { color: #60a5fa; text-decoration: none; }
+.brief-panel a:hover { text-decoration: underline; }
+
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: #0a0d12; }
 ::-webkit-scrollbar-thumb { background: #1e2530; border-radius: 3px; }
