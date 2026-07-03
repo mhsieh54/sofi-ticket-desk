@@ -31,7 +31,9 @@ Rules that constrain recommendations:
 - BTS: hard ceiling $625/ticket (ARMY boycott risk above that) — never recommend exceeding it.
 - Prefer section-specific signals over event-aggregate pricing.
 
-You have web search. For each active event, search for current resale/demand signals (recent listing prices, tour momentum, comparable-market dates, supply pressure). You will NOT find exact live SoFi section floors — that's fine; give directional read and a clear recommendation, and say when a signal is soft or unavailable rather than inventing a number.`;
+You have web search. For each active event, search for current resale/demand signals (recent listing prices, tour momentum, comparable-market dates, supply pressure). You will NOT find exact live SoFi section floors — that's fine; give directional read and a clear recommendation, and say when a signal is soft or unavailable rather than inventing a number.
+
+OUTPUT FORMAT — strict: Respond with ONLY the finished brief in Markdown. Do not narrate your process, do not write any preamble or "I'll now…" lines, and do not include a top-level "# " title (the file already has one). Your very first line must be "## Bottom line".`;
 
 function activeSellEvents(positions) {
   const sell = positions.filter((p) => p.category === "SELL" && !p.sold);
