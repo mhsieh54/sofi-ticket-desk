@@ -1,0 +1,51 @@
+name: Brief compare
+
+# One-off model comparison: runs the same brief prompt through multiple models
+# and commits the results to data/compare/ so they can be evaluated side by
+# side. Manual trigger only — does not run on a schedule and does not touch the
+# scheduled briefs in data/briefs/.
+
+on:
+  workflow_dispatch:
+    inputs:
+      models:
+        description: "Comma-separated models to compare"
+        required: false
+        default: "claude-opus-4-8,claude-sonnet-5"
+
+concurrency:
+  group: brief-compare
+  cancel-in-progress: false
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install script dependencies
+        run: npm install --prefix scripts
+
+      - name: Run comparison
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          MODELS: ${{ github.event.inputs.models }}
+        run: node scripts/brief-compare.mjs
+
+      - name: Commit comparison output
+        run: |
+          git config user.name "sofi-market-bot"
+          git config user.email "actions@github.com"
+          git add data/compare
+          if git diff --staged --quiet; then
+            echo "No comparison changes to commit."
+          else
+            git commit -m "Brief comparison $(date -u +%Y-%m-%d)"
+            git push
+          fi
