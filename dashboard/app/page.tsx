@@ -3,19 +3,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { PLATFORM_FEES, netPayout } from "@/lib/fees";
-import type { Position, Comp, Brief } from "@/lib/types";
-
-// Your ask is flagged DROP when it sits more than this above the section
-// floor — straight from the CLAUDE.md morning-brief rule (>10% above floor).
-const DROP_THRESHOLD = 1.1;
-
-// Latest logged comp for a position's exact event + section, or null.
-function latestCompFor(p: Position, comps: Comp[]): Comp | null {
-  const matches = comps
-    .filter((c) => c.event === p.event && c.eventDate === p.date && c.section === p.section)
-    .sort((a, b) => b.loggedAt.localeCompare(a.loggedAt));
-  return matches[0] ?? null;
-}
+import type { Position, Brief } from "@/lib/types";
 
 const CATEGORY_COLOR: Record<string, string> = {
   SELL: "#F0C040",
@@ -129,12 +117,11 @@ function buildTimeline(inventory: Position[]): TimelineItem[] {
   return items;
 }
 
-type Tab = "overview" | "inventory" | "football" | "comps" | "brief" | "sold";
+type Tab = "overview" | "brief" | "inventory" | "football" | "sold";
 
 export default function DashboardPage() {
   const [inventory, setInventory] = useState<Position[] | null>(null);
   const [sold, setSold] = useState<Position[] | null>(null);
-  const [comps, setComps] = useState<Comp[]>([]);
   const [briefs, setBriefs] = useState<Brief[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -145,17 +132,14 @@ export default function DashboardPage() {
 
   async function load() {
     setLoading(true);
-    const [posRes, compRes, briefRes] = await Promise.all([
+    const [posRes, briefRes] = await Promise.all([
       fetch("/api/positions"),
-      fetch("/api/comps"),
       fetch("/api/briefs"),
     ]);
     const posData = await posRes.json();
-    const compData = await compRes.json();
     const briefData = await briefRes.json();
     setInventory(posData.inventory || []);
     setSold(posData.sold || []);
-    setComps(compData.comps || []);
     setBriefs(briefData.briefs || []);
     setLoading(false);
   }
@@ -163,23 +147,6 @@ export default function DashboardPage() {
   useEffect(() => {
     load();
   }, []);
-
-  async function logComp(payload: any): Promise<boolean> {
-    setError("");
-    const res = await fetch("/api/comps", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    if (!res.ok) {
-      const body = await res.json().catch(() => ({}));
-      setError(body.error || "Failed to log comp");
-      return false;
-    }
-    const data = await res.json();
-    setComps(data.comps);
-    return true;
-  }
 
   async function patchPosition(id: number, payload: any): Promise<boolean> {
     setError("");
@@ -285,10 +252,9 @@ export default function DashboardPage() {
 
       <nav className="tabs">
         <button className={`tab-btn ${tab === "overview" ? "active" : ""}`} onClick={() => setTab("overview")}>Overview</button>
+        <button className={`tab-btn ${tab === "brief" ? "active" : ""}`} onClick={() => setTab("brief")}>Brief</button>
         <button className={`tab-btn ${tab === "inventory" ? "active" : ""}`} onClick={() => setTab("inventory")}>Inventory</button>
         <button className={`tab-btn ${tab === "football" ? "active" : ""}`} onClick={() => setTab("football")}>Football</button>
-        <button className={`tab-btn ${tab === "comps" ? "active" : ""}`} onClick={() => setTab("comps")}>Comps</button>
-        <button className={`tab-btn ${tab === "brief" ? "active" : ""}`} onClick={() => setTab("brief")}>Brief</button>
         <button className={`tab-btn ${tab === "sold" ? "active" : ""}`} onClick={() => setTab("sold")}>Sold</button>
       </nav>
 
@@ -330,6 +296,14 @@ export default function DashboardPage() {
           </div>
         )}
 
+        {tab === "brief" && (
+          <div>
+            <div className="page-title">Market Brief</div>
+            <div className="page-subtitle">Directional market read from the scheduled agent (Mon/Wed/Fri).</div>
+            <BriefTab briefs={briefs} />
+          </div>
+        )}
+
         {tab === "inventory" && (
           <div>
             <div className="page-title">Inventory</div>
@@ -345,7 +319,7 @@ export default function DashboardPage() {
                 </span>
               </div>
               {sortedInventory.map((p) => (
-                <TicketRow key={p.id} p={p} comp={latestCompFor(p, comps)} {...editHandlers(p)} />
+                <TicketRow key={p.id} p={p} {...editHandlers(p)} />
               ))}
             </div>
           </div>
@@ -367,30 +341,9 @@ export default function DashboardPage() {
               {footballPositions.length === 0 ? (
                 <div className="roadmap-empty">No football positions found.</div>
               ) : (
-                footballPositions.map((p) => <TicketRow key={p.id} p={p} comp={latestCompFor(p, comps)} {...editHandlers(p)} />)
+                footballPositions.map((p) => <TicketRow key={p.id} p={p} {...editHandlers(p)} />)
               )}
             </div>
-          </div>
-        )}
-
-        {tab === "comps" && (
-          <div>
-            <div className="page-title">Comps</div>
-            <div className="page-subtitle">
-              Log section floors from the live map as you check them. Your ask is flagged{" "}
-              <span style={{ color: "#f87171" }}>DROP</span> on Inventory when it&apos;s more than 10% above the latest floor.
-            </div>
-            <CompsTab positions={activeSell} comps={comps} onLog={logComp} />
-          </div>
-        )}
-
-        {tab === "brief" && (
-          <div>
-            <div className="page-title">Market Brief</div>
-            <div className="page-subtitle">
-              Directional market read from the scheduled agent (Mon/Wed/Fri). Not exact floors — those live in Comps.
-            </div>
-            <BriefTab briefs={briefs} />
           </div>
         )}
 
@@ -509,7 +462,6 @@ function MonthlyRoadmap({ items }: { items: TimelineItem[] }) {
 
 function TicketRow({
   p,
-  comp,
   editing,
   selling,
   onEdit,
@@ -518,7 +470,6 @@ function TicketRow({
   onSaveSell,
 }: {
   p: Position;
-  comp: Comp | null;
   editing: boolean;
   selling: boolean;
   onEdit: () => void;
@@ -544,8 +495,6 @@ function TicketRow({
       ? { profit: (netPayout(p.ask, p.platform) - p.face) * p.qty, roi: ((netPayout(p.ask, p.platform) - p.face) / p.face) * 100 }
       : null;
 
-  const shouldDrop = comp != null && p.ask != null && p.ask > comp.floor * DROP_THRESHOLD;
-
   return (
     <div className="ticket-row">
       <div className="ticket-main">
@@ -561,11 +510,6 @@ function TicketRow({
           >
             {p.category}
           </span>
-          {shouldDrop && (
-            <span className="badge" style={{ background: "#f8717122", color: "#f87171", border: "1px solid #f8717166" }}>
-              ⚠ DROP
-            </span>
-          )}
         </div>
         <div className="ticket-meta">
           Sec {p.section} · Row {p.row} · Seats {p.seats} · {p.qty}x · {p.date}
@@ -574,11 +518,6 @@ function TicketRow({
 
       <span className="ticket-figure">Cost: <strong>${p.face.toFixed(0)}</strong></span>
       {p.ask != null && <span className="ticket-figure">Ask: <strong style={{ color: "#F0C040" }}>${p.ask}</strong></span>}
-      {comp != null && (
-        <span className="ticket-figure">
-          Floor: <strong style={{ color: shouldDrop ? "#f87171" : "#4ade80" }}>${comp.floor}</strong>
-        </span>
-      )}
       {p.platform && (
         <span
           className="badge-platform"
@@ -711,151 +650,6 @@ function SoldRow({ p }: { p: Position }) {
   );
 }
 
-function CompsTab({
-  positions,
-  comps,
-  onLog,
-}: {
-  positions: Position[];
-  comps: Comp[];
-  onLog: (payload: any) => Promise<boolean>;
-}) {
-  // One selectable target per unique event+section among active SELL positions.
-  const targets = Array.from(
-    new Map(
-      positions.map((p) => [`${p.event}|${p.date}|${p.section}`, { event: p.event, eventDate: p.date, section: p.section }])
-    ).values()
-  );
-
-  const [selected, setSelected] = useState(0);
-  const [floor, setFloor] = useState("");
-  const [comp2, setComp2] = useState("");
-  const [comp3, setComp3] = useState("");
-  const [source, setSource] = useState("StubHub");
-  const [notes, setNotes] = useState("");
-  const [saving, setSaving] = useState(false);
-
-  async function submit() {
-    const t = targets[selected];
-    if (!t || !floor) return;
-    setSaving(true);
-    const ok = await onLog({
-      event: t.event,
-      eventDate: t.eventDate,
-      section: t.section,
-      floor,
-      comp2,
-      comp3,
-      source,
-      notes,
-    });
-    setSaving(false);
-    if (ok) {
-      setFloor("");
-      setComp2("");
-      setComp3("");
-      setNotes("");
-    }
-  }
-
-  // Group logged comps by event+section, newest first within each group.
-  const groups = new Map<string, Comp[]>();
-  for (const c of comps) {
-    const key = `${c.event}|${c.eventDate}|${c.section}`;
-    if (!groups.has(key)) groups.set(key, []);
-    groups.get(key)!.push(c);
-  }
-  for (const list of groups.values()) list.sort((a, b) => b.loggedAt.localeCompare(a.loggedAt));
-  const groupList = Array.from(groups.entries()).sort((a, b) => b[1][0].loggedAt.localeCompare(a[1][0].loggedAt));
-
-  return (
-    <div>
-      <div className="comp-form">
-        <div className="list-panel-label" style={{ marginBottom: 4 }}>Log a reading</div>
-        {targets.length === 0 ? (
-          <div className="roadmap-empty">No active SELL positions to log comps against.</div>
-        ) : (
-          <>
-            <label>
-              Position
-              <select value={selected} onChange={(e) => setSelected(Number(e.target.value))}>
-                {targets.map((t, i) => (
-                  <option key={i} value={i}>
-                    {t.event} — Sec {t.section} ({t.eventDate})
-                  </option>
-                ))}
-              </select>
-            </label>
-            <div className="comp-form-row">
-              <label>Floor $<input inputMode="decimal" value={floor} onChange={(e) => setFloor(e.target.value)} placeholder="620" /></label>
-              <label>2nd $<input inputMode="decimal" value={comp2} onChange={(e) => setComp2(e.target.value)} placeholder="650" /></label>
-              <label>3rd $<input inputMode="decimal" value={comp3} onChange={(e) => setComp3(e.target.value)} placeholder="675" /></label>
-            </div>
-            <label>
-              Source
-              <select value={source} onChange={(e) => setSource(e.target.value)}>
-                {Object.keys(PLATFORM_FEES).concat("SeatGeek").map((name) => (
-                  <option key={name} value={name}>{name}</option>
-                ))}
-              </select>
-            </label>
-            <label>Notes<input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="optional" /></label>
-            <button className="btn-primary" disabled={saving || !floor} onClick={submit}>
-              {saving ? "Saving…" : "Log Comp"}
-            </button>
-          </>
-        )}
-      </div>
-
-      <div className="list-panel" style={{ marginTop: 16 }}>
-        <div className="list-panel-header">
-          <span className="list-panel-label">Logged Comps ({comps.length})</span>
-        </div>
-        {groupList.length === 0 ? (
-          <div className="roadmap-empty">No comps logged yet. Log your first reading above.</div>
-        ) : (
-          groupList.map(([key, list]) => {
-            const latest = list[0];
-            const prev = list[1];
-            const delta = prev ? latest.floor - prev.floor : null;
-            return (
-              <div key={key} className="comp-group">
-                <div className="comp-group-head">
-                  <span className="ticket-event">
-                    {latest.event} <span style={{ color: "#5a6478", fontWeight: 400 }}>· Sec {latest.section}</span>
-                  </span>
-                  <span className="ticket-figure">
-                    Floor: <strong style={{ color: "#F0C040" }}>${latest.floor}</strong>
-                    {delta != null && (
-                      <span style={{ color: delta > 0 ? "#4ade80" : delta < 0 ? "#f87171" : "#5a6478", marginLeft: 6 }}>
-                        {delta > 0 ? "▲" : delta < 0 ? "▼" : "—"} ${Math.abs(delta)}
-                      </span>
-                    )}
-                  </span>
-                </div>
-                <div className="comp-history">
-                  {list.map((c) => (
-                    <div key={c.id} className="comp-history-row">
-                      <span>{new Date(c.loggedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
-                      <span>
-                        ${c.floor}
-                        {c.comp2 != null && ` / $${c.comp2}`}
-                        {c.comp3 != null && ` / $${c.comp3}`}
-                      </span>
-                      {c.source && <span style={{ color: "#5a6478" }}>{c.source}</span>}
-                      {c.notes && <span style={{ color: "#5a6478" }}>{c.notes}</span>}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            );
-          })
-        )}
-      </div>
-    </div>
-  );
-}
-
 function BriefTab({ briefs }: { briefs: Brief[] }) {
   const [selected, setSelected] = useState(0);
 
@@ -875,7 +669,7 @@ function BriefTab({ briefs }: { briefs: Brief[] }) {
   return (
     <div>
       {briefs.length > 1 && (
-        <div className="comp-form" style={{ marginBottom: 16 }}>
+        <div className="mini-form" style={{ marginBottom: 16 }}>
           <label>
             Brief date
             <select value={selected} onChange={(e) => setSelected(Number(e.target.value))}>

@@ -7,8 +7,14 @@ name: Market brief
 
 on:
   schedule:
-    # Mon / Wed / Fri at 14:00 UTC (~6-7am Los Angeles, DST-dependent).
-    - cron: "0 14 * * 1,3,5"
+    # Mon / Wed / Fri, ~7am Pacific. GitHub Actions cron is fixed UTC (no DST
+    # awareness), so this is pinned to current Pacific Daylight Time
+    # (UTC-7) — it'll read as 6am once clocks fall back to PST in November;
+    # shift to "17 15 * * 1,3,5" then if exact 7am matters more than a
+    # one-line reminder. Also offset 17 minutes past the hour, not on the
+    # dot — GitHub's own docs note on-the-hour schedules queue/skip more
+    # often under load, which is what caused a missed Friday run.
+    - cron: "17 14 * * 1,3,5"
   workflow_dispatch:
     inputs:
       model:

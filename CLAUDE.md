@@ -14,7 +14,7 @@
 
 ## Core rules
 - True cost = face value + ALL Ticketmaster/platform service fees. Never use face alone.
-- 30% minimum ROI target after fees.
+- Priority is actually selling — an unsold ticket earns nothing. Maximize profit within what the market will bear; don't let a fixed ROI% target block a real sale above true cost.
 - Never price below true cost basis.
 - One platform per pair — no double-listing the same seats.
 - AutoPrice OFF on StubHub.
@@ -32,7 +32,7 @@ Every position gets exactly one tag:
 ## File conventions
 - Active inventory: `data/inventory.json`
 - Sold/realized: `data/sold.json`
-- Comp readings: `data/comps.json` — flat append-only log of section-floor readings (event, section, floor, comp2, comp3, source, loggedAt). Flat file rather than dated folders so the dashboard can trend a section over time without globbing.
+- Market briefs: `data/briefs/YYYY-MM-DD.md` — dated narrative briefs from the scheduled agent
 - Per-event strategy: `strategy/<event>.md`
 - Session handoffs: `handoffs/YYYY-MM-DD.md`
 - Dashboard app: `dashboard/`
