@@ -3,7 +3,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { PLATFORM_FEES, netPayout } from "@/lib/fees";
-import type { Position, Brief } from "@/lib/types";
+import type { Position, Category, Brief } from "@/lib/types";
 
 const CATEGORY_COLOR: Record<string, string> = {
   SELL: "#F0C040",
@@ -482,6 +482,7 @@ function TicketRow({
   const [targetAsk, setTargetAsk] = useState(p.targetAsk?.toString() || "");
   const [targetPlatform, setTargetPlatform] = useState(p.targetPlatform || "");
   const [notes, setNotes] = useState(p.notes || "");
+  const [category, setCategory] = useState<Category>(p.category);
 
   const [soldPrice, setSoldPrice] = useState(p.targetAsk?.toString() || p.ask?.toString() || "");
   const [soldPlatform, setSoldPlatform] = useState(p.targetPlatform || p.platform || "StubHub");
@@ -542,7 +543,7 @@ function TicketRow({
       )}
       <span className="ticket-status">{p.status}</span>
 
-      {p.category === "SELL" && p.status !== "sold" && (
+      {p.status !== "sold" && (
         <div className="ticket-actions">
           <button className="btn-small" onClick={onEdit}>{editing ? "Cancel" : "Edit"}</button>
           <button className="btn-small btn-sell" onClick={onSell}>{selling ? "Cancel" : "Mark Sold"}</button>
@@ -553,18 +554,43 @@ function TicketRow({
 
       {editing && (
         <div className="edit-form">
-          <label>Platform<input value={platform} onChange={(e) => setPlatform(e.target.value)} placeholder="StubHub" /></label>
-          <label>Ask<input value={ask} onChange={(e) => setAsk(e.target.value)} placeholder="500" /></label>
-          <label>Target Ask<input value={targetAsk} onChange={(e) => setTargetAsk(e.target.value)} /></label>
-          <label>Target Platform<input value={targetPlatform} onChange={(e) => setTargetPlatform(e.target.value)} /></label>
+          <label>
+            Category
+            <select value={category} onChange={(e) => setCategory(e.target.value as Category)}>
+              {(["SELL", "ATTEND", "CLIENT", "KEEP"] as Category[]).map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Listed on (platform)
+            <select value={platform} onChange={(e) => setPlatform(e.target.value)}>
+              <option value="">— not listed —</option>
+              {Object.keys(PLATFORM_FEES).map((name) => (
+                <option key={name} value={name}>{name}</option>
+              ))}
+            </select>
+          </label>
+          <label>Ask (current listing price)<input inputMode="decimal" value={ask} onChange={(e) => setAsk(e.target.value)} placeholder="e.g. 500" /></label>
+          <label>Target Ask<input inputMode="decimal" value={targetAsk} onChange={(e) => setTargetAsk(e.target.value)} placeholder="optional" /></label>
+          <label>
+            Target Platform
+            <select value={targetPlatform} onChange={(e) => setTargetPlatform(e.target.value)}>
+              <option value="">— none —</option>
+              {Object.keys(PLATFORM_FEES).map((name) => (
+                <option key={name} value={name}>{name}</option>
+              ))}
+            </select>
+          </label>
           <label>Notes<textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} /></label>
           <button
             className="btn-primary"
             onClick={() =>
               onSaveEdit({
+                category,
                 platform: platform || null,
                 ask: ask ? Number(ask) : null,
-                status: platform && ask ? "listed" : p.status,
+                status: platform && ask ? "listed" : "held",
                 targetAsk: targetAsk ? Number(targetAsk) : null,
                 targetPlatform: targetPlatform || null,
                 notes: notes || null,
