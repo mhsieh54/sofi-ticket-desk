@@ -128,7 +128,22 @@ export default function DashboardPage() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [sellingId, setSellingId] = useState<number | null>(null);
   const [tab, setTab] = useState<Tab>("overview");
+  const [briefRunning, setBriefRunning] = useState(false);
+  const [briefRunMsg, setBriefRunMsg] = useState("");
   const router = useRouter();
+
+  async function runBriefNow() {
+    setBriefRunning(true);
+    setBriefRunMsg("");
+    const res = await fetch("/api/run-brief", { method: "POST" });
+    setBriefRunning(false);
+    if (res.ok) {
+      setBriefRunMsg("Triggered. New brief generates and deploys in ~2-3 min — refresh this page then.");
+    } else {
+      const body = await res.json().catch(() => ({}));
+      setBriefRunMsg(body.error || "Failed to trigger the brief.");
+    }
+  }
 
   async function load() {
     setLoading(true);
@@ -300,6 +315,12 @@ export default function DashboardPage() {
           <div>
             <div className="page-title">Market Brief</div>
             <div className="page-subtitle">Directional market read from the scheduled agent (Mon/Wed/Fri).</div>
+            <div className="brief-run">
+              <button className="btn-primary" style={{ margin: 0 }} disabled={briefRunning} onClick={runBriefNow}>
+                {briefRunning ? "Triggering…" : "Run brief now"}
+              </button>
+              {briefRunMsg && <span className="brief-run-msg">{briefRunMsg}</span>}
+            </div>
             <BriefTab briefs={briefs} />
           </div>
         )}

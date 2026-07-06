@@ -27,6 +27,10 @@ on:
         description: "Model override (e.g. claude-sonnet-5 for lower cost)"
         required: false
         default: ""
+  # Lets a Contents-scoped token trigger a rerun via the repository_dispatch
+  # API (workflow_dispatch needs Actions scope; repository_dispatch doesn't).
+  repository_dispatch:
+    types: [run-brief]
 
 concurrency:
   group: market-brief
@@ -65,7 +69,7 @@ jobs:
         if: steps.guard.outputs.skip != 'true'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          MODEL: ${{ github.event.inputs.model }}
+          MODEL: ${{ github.event.inputs.model || github.event.client_payload.model || '' }}
         run: node scripts/market-brief.mjs
 
       - name: Commit brief if changed

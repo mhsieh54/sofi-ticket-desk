@@ -447,6 +447,14 @@ input::placeholder, textarea::placeholder { color: #2e3545; }
 }
 
 /* Market brief */
+.brief-run {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.brief-run-msg { font-size: 12px; color: #5a6478; }
 .brief-panel {
   background: #111418;
   border: 1px solid #1e2530;
