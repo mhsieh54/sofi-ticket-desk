@@ -322,7 +322,7 @@
       "qty": 2,
       "face": 375,
       "fmv": null,
-      "category": "ATTEND",
+      "category": "SELL",
       "status": "held",
       "platform": null,
       "ask": null,
@@ -334,7 +334,7 @@
       "targetPlatform": null,
       "targetSellDate": null,
       "clientReserved": 0,
-      "notes": "Biggest LA-rivalry atmosphere — attending."
+      "notes": "In San Diego, need to sell. Biggest LA-rivalry atmosphere — attending."
     },
     {
       "id": 22,
