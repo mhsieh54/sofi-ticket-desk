@@ -359,6 +359,17 @@ input::placeholder, textarea::placeholder { color: #2e3545; }
   line-height: 1.4;
   margin-top: -2px;
 }
+.ticket-brief-note {
+  flex-basis: 100%;
+  color: #cbb26b;
+  font-size: 11px;
+  line-height: 1.45;
+  margin-top: 2px;
+  padding: 5px 8px;
+  background: #F0C0400d;
+  border-left: 2px solid #F0C04066;
+  border-radius: 4px;
+}
 
 .btn-small {
   background: #1e2530;

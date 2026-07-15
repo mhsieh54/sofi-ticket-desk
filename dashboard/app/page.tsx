@@ -128,6 +128,8 @@ export default function DashboardPage() {
   const [inventory, setInventory] = useState<Position[] | null>(null);
   const [sold, setSold] = useState<Position[] | null>(null);
   const [briefs, setBriefs] = useState<Brief[]>([]);
+  const [briefNotes, setBriefNotes] = useState<Record<string, string>>({});
+  const [briefNotesDate, setBriefNotesDate] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -160,6 +162,8 @@ export default function DashboardPage() {
     const briefData = await briefRes.json();
     setInventory(posData.inventory || []);
     setSold(posData.sold || []);
+    setBriefNotes(posData.briefNotes?.notes || {});
+    setBriefNotesDate(posData.briefNotes?.generatedAt || null);
     setBriefs(briefData.briefs || []);
     setLoading(false);
   }
@@ -345,7 +349,7 @@ export default function DashboardPage() {
                 </span>
               </div>
               {sortedInventory.map((p) => (
-                <TicketRow key={p.id} p={p} {...editHandlers(p)} />
+                <TicketRow key={p.id} p={p} briefNote={briefNotes[p.id]} briefNoteDate={briefNotesDate} {...editHandlers(p)} />
               ))}
             </div>
           </div>
@@ -367,7 +371,7 @@ export default function DashboardPage() {
               {footballPositions.length === 0 ? (
                 <div className="roadmap-empty">No football positions found.</div>
               ) : (
-                footballPositions.map((p) => <TicketRow key={p.id} p={p} {...editHandlers(p)} />)
+                footballPositions.map((p) => <TicketRow key={p.id} p={p} briefNote={briefNotes[p.id]} briefNoteDate={briefNotesDate} {...editHandlers(p)} />)
               )}
             </div>
           </div>
@@ -488,6 +492,8 @@ function MonthlyRoadmap({ items }: { items: TimelineItem[] }) {
 
 function TicketRow({
   p,
+  briefNote,
+  briefNoteDate,
   editing,
   selling,
   onEdit,
@@ -496,6 +502,8 @@ function TicketRow({
   onSaveSell,
 }: {
   p: Position;
+  briefNote?: string;
+  briefNoteDate?: string | null;
   editing: boolean;
   selling: boolean;
   onEdit: () => void;
@@ -602,6 +610,11 @@ function TicketRow({
       )}
 
       {p.notes && <div className="ticket-notes">{p.notes}</div>}
+      {briefNote && (
+        <div className="ticket-brief-note" title={briefNoteDate ? `From the ${briefNoteDate} brief` : undefined}>
+          📋 {briefNote}
+        </div>
+      )}
 
       {editing && (
         <div className="edit-form">

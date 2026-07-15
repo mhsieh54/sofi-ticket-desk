@@ -25,3 +25,15 @@ export async function readBriefs(): Promise<Brief[]> {
     return [];
   }
 }
+
+// Per-position brief snippets: { generatedAt, notes: { [positionId]: snippet } }.
+export async function readBriefNotes(): Promise<{ generatedAt: string | null; notes: Record<string, string> }> {
+  const filePath = path.join(DATA_DIR, "brief-notes.json");
+  try {
+    const raw = await readFile(filePath, "utf-8");
+    const parsed = JSON.parse(raw);
+    return { generatedAt: parsed.generatedAt ?? null, notes: parsed.notes ?? {} };
+  } catch {
+    return { generatedAt: null, notes: {} };
+  }
+}

@@ -87,3 +87,55 @@ export async function generateBrief(client, events, model) {
   if (!text) throw new Error(`Model ${model} returned no text content.`);
   return text;
 }
+
+// Second pass: distill the prose brief into a one-line actionable snippet per
+// position, keyed by position id. Uses structured outputs so the result is
+// reliably parseable. No web search here — it's pure extraction from the brief
+// text already generated, so it's fast and cheap.
+export async function extractBriefNotes(client, briefText, positions, model) {
+  const posList = positions.map((p) => `id ${p.id}: ${p.event} — Sec ${p.section}`).join("\n");
+  const schema = {
+    type: "object",
+    properties: {
+      notes: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            id: { type: "integer" },
+            snippet: { type: "string" },
+          },
+          required: ["id", "snippet"],
+          additionalProperties: false,
+        },
+      },
+    },
+    required: ["notes"],
+    additionalProperties: false,
+  };
+
+  const res = await client.messages.create({
+    model,
+    max_tokens: 3000,
+    output_config: { format: { type: "json_schema", schema } },
+    messages: [
+      {
+        role: "user",
+        content: `Today's market brief:\n\n${briefText}\n\nActive positions:\n${posList}\n\nFor each position id, extract a single actionable recommendation (≤140 characters) drawn from the brief's guidance for that exact event + section — e.g. "Hold on TickPick $781; trim to ~$740 if flat by 7/12" or "List now $475 on Vivid; ceiling $625". If the brief has no guidance for a position, use an empty string. Return an entry for every id.`,
+      },
+    ],
+  });
+
+  const text = res.content
+    .filter((b) => b.type === "text")
+    .map((b) => b.text)
+    .join("");
+  const parsed = JSON.parse(text);
+  const map = {};
+  for (const n of parsed.notes || []) {
+    if (n && typeof n.id === "number" && n.snippet && n.snippet.trim()) {
+      map[n.id] = n.snippet.trim();
+    }
+  }
+  return map;
+}

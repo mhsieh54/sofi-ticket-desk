@@ -13,6 +13,15 @@ for (const file of ["inventory.json", "sold.json"]) {
   fs.copyFileSync(path.join(SRC, file), path.join(DEST, file));
 }
 
+// Per-position brief snippets (written by the brief pipeline). May be absent
+// on an older checkout — seed an empty map so the build never fails.
+{
+  const src = path.join(SRC, "brief-notes.json");
+  const dest = path.join(DEST, "brief-notes.json");
+  if (fs.existsSync(src)) fs.copyFileSync(src, dest);
+  else fs.writeFileSync(dest, JSON.stringify({ generatedAt: null, notes: {} }, null, 2) + "\n");
+}
+
 // Consolidate the market briefs (data/briefs/*.md) into a single JSON file the
 // app reads — one proven read path, no runtime directory scanning or
 // cross-root file tracing.

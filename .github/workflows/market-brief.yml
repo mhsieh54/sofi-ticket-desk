@@ -43,6 +43,8 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history so we can rebase before pushing
 
       - name: Guard — skip a scheduled slot if today's brief already exists
         id: guard
@@ -77,10 +79,19 @@ jobs:
         run: |
           git config user.name "sofi-market-bot"
           git config user.email "actions@github.com"
-          git add data/briefs
+          git add data/briefs data/brief-notes.json
           if git diff --staged --quiet; then
             echo "No brief changes to commit."
           else
             git commit -m "Market brief ${{ steps.guard.outputs.today }}"
-            git push
+            # The dashboard may have pushed inventory edits since checkout. The
+            # brief files are disjoint from inventory.json, so rebase + retry
+            # lands cleanly rather than failing on a non-fast-forward push.
+            for attempt in 1 2 3; do
+              git fetch origin master
+              git rebase origin/master || { git rebase --abort; echo "unexpected conflict"; exit 1; }
+              if git push; then echo "pushed"; break; fi
+              echo "push rejected, retrying ($attempt)…"
+              sleep 3
+            done
           fi

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { readPositions } from "@/lib/data";
+import { readPositions, readBriefNotes } from "@/lib/data";
 import { getFile, putFile } from "@/lib/github";
 import { netPayout } from "@/lib/fees";
 
@@ -7,11 +7,12 @@ const INVENTORY_PATH = "data/inventory.json";
 const SOLD_PATH = "data/sold.json";
 
 export async function GET() {
-  const [inventory, sold] = await Promise.all([
+  const [inventory, sold, briefNotes] = await Promise.all([
     readPositions("inventory"),
     readPositions("sold"),
+    readBriefNotes(),
   ]);
-  return NextResponse.json({ inventory, sold });
+  return NextResponse.json({ inventory, sold, briefNotes });
 }
 
 export async function PATCH(req: NextRequest) {
