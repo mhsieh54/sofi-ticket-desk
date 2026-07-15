@@ -157,7 +157,7 @@
       "category": "SELL",
       "status": "listed",
       "platform": "Ticketmaster",
-      "ask": 720,
+      "ask": 650,
       "sold": false,
       "soldDate": null,
       "soldPayout": null,
@@ -166,7 +166,7 @@
       "targetPlatform": "Ticketmaster",
       "targetSellDate": "2026-07-16",
       "clientReserved": 0,
-      "notes": "Listed on ticketmaster, $720. "
+      "notes": "Listed on ticketmaster. "
     },
     {
       "id": 15,
