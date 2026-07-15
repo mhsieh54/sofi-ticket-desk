@@ -15,6 +15,7 @@ export interface Position {
   status: Status;
   platform: string | null;
   ask: number | null;
+  askSetAt?: string | null; // YYYY-MM-DD the current ask/platform was set — drives "days listed at this price"
   sold: boolean;
   soldDate: string | null;
   soldPayout: number | null;

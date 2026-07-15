@@ -47,7 +47,23 @@ export async function PATCH(req: NextRequest) {
     }
 
     const { updates } = body;
-    const updated = { ...positions[idx], ...updates };
+    const prev = positions[idx];
+    const updated = { ...prev, ...updates };
+
+    // Stamp when the current ask/platform took effect, so the UI can show
+    // "days listed at this price". Reset the clock when the price or platform
+    // changes (a re-list), or on first save of an already-listed position;
+    // clear it when the position is no longer listed.
+    if (updates && ("ask" in updates || "platform" in updates)) {
+      const today = new Date().toISOString().slice(0, 10);
+      if (updated.ask == null) {
+        updated.askSetAt = null;
+      } else if (updated.ask !== prev.ask || updated.platform !== prev.platform || !prev.askSetAt) {
+        updated.askSetAt = today;
+      }
+      // else: same ask + platform and already tracked → keep prev.askSetAt (via spread)
+    }
+
     const newInventory = [...positions];
     newInventory[idx] = updated;
 

@@ -26,6 +26,11 @@ function daysUntil(dateStr: string): number {
   return Math.ceil((target.getTime() - now.getTime()) / 86400000);
 }
 
+function daysSince(dateStr: string): number {
+  const start = new Date(dateStr + "T00:00:00");
+  return Math.max(0, Math.floor((Date.now() - start.getTime()) / 86400000));
+}
+
 function urgencyColor(days: number): string {
   if (days < 7) return "#f87171";
   if (days < 14) return "#F0C040";
@@ -560,6 +565,11 @@ function TicketRow({
           }}
         >
           {p.platform}
+        </span>
+      )}
+      {p.status === "listed" && p.askSetAt && (
+        <span className="ticket-figure" title={`At $${p.ask} on ${p.platform} since ${p.askSetAt}`}>
+          Listed: <strong>{daysSince(p.askSetAt)}d</strong>
         </span>
       )}
       {netInfo && (
