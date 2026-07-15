@@ -216,7 +216,8 @@
       "targetPlatform": "Vivid Seats",
       "targetSellDate": "2026-07-16",
       "clientReserved": 0,
-      "notes": "moved to tickpick. priced low to move, monitor to see if i should raise."
+      "notes": "moved to tickpick. priced low to move, monitor to see if i should raise.",
+      "askSetAt": "2026-07-15"
     },
     {
       "id": 17,
