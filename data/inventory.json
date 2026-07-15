@@ -46,7 +46,8 @@
       "targetPlatform": "Vivid Seats",
       "targetSellDate": "2026-07-26",
       "clientReserved": 0,
-      "notes": "Target revised down from $675 to $475 — LA supply heavier than expected. Confirmed ceiling: do not exceed $625 ask (ARMY boycott risk)."
+      "notes": "Target revised down from $675 to $475 — LA supply heavier than expected. Confirmed ceiling: do not exceed $625 ask (ARMY boycott risk).",
+      "askSetAt": "2026-07-15"
     },
     {
       "id": 9,
