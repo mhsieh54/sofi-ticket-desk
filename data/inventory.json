@@ -71,7 +71,8 @@
       "targetPlatform": "StubHub",
       "targetSellDate": "2026-07-26",
       "clientReserved": 0,
-      "notes": "Target revised down from $675 to $475. Saturday date has highest floor of the 4 LA nights."
+      "notes": "Target revised down from $675 to $475. Saturday date has highest floor of the 4 LA nights.",
+      "askSetAt": "2026-07-15"
     },
     {
       "id": 10,
