@@ -417,6 +417,26 @@ input::placeholder, textarea::placeholder { color: #2e3545; }
 }
 .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
+/* Live net-after-fees preview in edit / sold forms */
+.net-preview {
+  background: #0a0d12;
+  border: 1px solid #1e2530;
+  border-radius: 6px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.net-preview-main {
+  font-family: monospace;
+  font-size: 15px;
+  font-weight: 700;
+  color: #4ade80;
+}
+.net-preview-sub { font-size: 11px; color: #5a6478; line-height: 1.5; }
+.net-preview-sub strong { color: #cdd6f4; }
+.net-preview-hint { font-size: 12px; color: #5a6478; }
+
 /* Small inline form panel (e.g. the Brief tab's date picker) */
 .mini-form {
   background: #111418;

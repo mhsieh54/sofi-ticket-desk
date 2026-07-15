@@ -510,11 +510,20 @@ function TicketRow({
   const [soldDate, setSoldDate] = useState(new Date().toISOString().slice(0, 10));
 
   const days = daysUntil(p.date);
-  const netInfo =
+  // proceeds = per-ticket payout after the platform's seller fee (the "true net").
+  const proceedsPerTkt =
     p.status === "sold" && p.soldPayout != null
-      ? { profit: (p.soldPayout - p.face) * p.qty, roi: ((p.soldPayout - p.face) / p.face) * 100 }
+      ? p.soldPayout
       : p.ask != null
-      ? { profit: (netPayout(p.ask, p.platform) - p.face) * p.qty, roi: ((netPayout(p.ask, p.platform) - p.face) / p.face) * 100 }
+      ? netPayout(p.ask, p.platform)
+      : null;
+  const netInfo =
+    proceedsPerTkt != null
+      ? {
+          proceeds: proceedsPerTkt,
+          profit: (proceedsPerTkt - p.face) * p.qty,
+          roi: ((proceedsPerTkt - p.face) / p.face) * 100,
+        }
       : null;
 
   return (
@@ -554,9 +563,10 @@ function TicketRow({
       )}
       {netInfo && (
         <span className="ticket-figure">
-          Net: <strong style={{ color: netInfo.profit >= 0 ? "#4ade80" : "#f87171" }}>
-            {netInfo.profit >= 0 ? "+" : ""}${netInfo.profit.toFixed(0)} ({netInfo.roi.toFixed(0)}% ROI)
-          </strong>
+          Net: <strong style={{ color: "#4ade80" }}>${netInfo.proceeds.toFixed(0)}/tkt</strong>
+          <span style={{ color: netInfo.profit >= 0 ? "#4ade80" : "#f87171" }}>
+            {" "}· P/L {netInfo.profit >= 0 ? "+" : ""}${netInfo.profit.toFixed(0)} ({netInfo.roi.toFixed(0)}%)
+          </span>
         </span>
       )}
       {p.status !== "sold" && (
@@ -593,6 +603,7 @@ function TicketRow({
             </select>
           </label>
           <label>Ask (current listing price)<input inputMode="decimal" value={ask} onChange={(e) => setAsk(e.target.value)} placeholder="e.g. 500" /></label>
+          <NetPreview price={ask} platform={platform} face={p.face} qty={p.qty} />
           <label>Target Ask<input inputMode="decimal" value={targetAsk} onChange={(e) => setTargetAsk(e.target.value)} placeholder="optional" /></label>
           <label>
             Target Platform
@@ -635,6 +646,7 @@ function TicketRow({
             </select>
           </label>
           <label>Sold Date<input type="date" value={soldDate} onChange={(e) => setSoldDate(e.target.value)} /></label>
+          <NetPreview price={soldPrice} platform={soldPlatform} face={p.face} qty={p.qty} priceLabel="sold price" />
           <button
             className="btn-primary"
             onClick={() => onSaveSell({ soldPrice: Number(soldPrice), platform: soldPlatform, soldDate })}
@@ -643,6 +655,45 @@ function TicketRow({
           </button>
         </div>
       )}
+    </div>
+  );
+}
+
+// Live net-after-fees preview. Recomputes on every keystroke / platform change,
+// so you see the true net before saving. proceeds = price × (1 − seller fee).
+function NetPreview({
+  price,
+  platform,
+  face,
+  qty,
+  priceLabel = "ask",
+}: {
+  price: string;
+  platform: string;
+  face: number;
+  qty: number;
+  priceLabel?: string;
+}) {
+  const priceN = Number(price);
+  if (!price || isNaN(priceN) || priceN <= 0) {
+    return <div className="net-preview net-preview-hint">Enter {priceLabel} + platform to see net after fees.</div>;
+  }
+  const fee = platform ? PLATFORM_FEES[platform]?.seller ?? 0 : 0;
+  const proceeds = priceN * (1 - fee);
+  const profit = proceeds - face;
+  const roi = face ? (profit / face) * 100 : 0;
+  return (
+    <div className="net-preview">
+      <span className="net-preview-main">Net ${proceeds.toFixed(2)}/tkt</span>
+      <span className="net-preview-sub">
+        after {platform ? `${(fee * 100).toFixed(0)}% ${platform} fee` : "no platform fee"} · profit{" "}
+        <span style={{ color: profit >= 0 ? "#4ade80" : "#f87171" }}>
+          {profit >= 0 ? "+" : ""}${profit.toFixed(2)}/tkt ({roi.toFixed(0)}% ROI)
+        </span>
+        {" · "}
+        {qty}× = <strong>${(proceeds * qty).toFixed(2)}</strong> net
+        {qty > 1 ? `, ${profit >= 0 ? "+" : ""}$${(profit * qty).toFixed(2)} profit` : ""}
+      </span>
     </div>
   );
 }
