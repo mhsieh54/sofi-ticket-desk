@@ -67,10 +67,10 @@ After this is set up, every edit made from any device (phone included) becomes a
 
 ## Market brief agent
 
-A scheduled agent (`scripts/market-brief.mjs`) web-searches current demand/pricing signals for each active SELL event and writes a dated brief to `data/briefs/`, shown in the dashboard's **Brief** tab. Runs via GitHub Actions **Mon/Wed/Fri, ~7am Pacific**. It's a directional market read (tour momentum, comparable-market pricing, demand signals) — not exact live section floors, since those aren't reliably scrapeable.
+A scheduled agent (`scripts/market-brief.mjs`) web-searches current demand/pricing signals for each active SELL event and writes a dated brief to `data/briefs/`, shown in the dashboard's **Brief** tab. Runs via GitHub Actions **Mon + Thu, ~7am Pacific**. It's a directional market read (tour momentum, comparable-market pricing, demand signals) — not exact live section floors, since those aren't reliably scrapeable.
 
 **One-time setup:** add an `ANTHROPIC_API_KEY` secret to the repo (GitHub → Settings → Secrets and variables → Actions → New repository secret). That's the only manual step. To test immediately: Actions tab → **Market brief** → **Run workflow**. To run cheaper, set the optional `model` input (e.g. `claude-sonnet-5`) when running manually, or add a `MODEL` env in the workflow — it defaults to `claude-opus-4-8`. A model-comparison harness (`scripts/brief-compare.mjs`, workflow **Brief compare**) runs multiple models on an identical prompt for side-by-side evaluation — see `data/compare/` after running it.
 
 ## Status
 
-Live: dashboard deployed to Vercel (Overview / Brief / Inventory / Football / Sold tabs), write-back to GitHub working from any device. Scheduled market-brief agent runs Mon/Wed/Fri (needs the `ANTHROPIC_API_KEY` secret to run). Full session-by-session history in `handoffs/`.
+Live: dashboard deployed to Vercel (Overview / Brief / Inventory / Football / Sold tabs), write-back to GitHub working from any device. Scheduled market-brief agent runs Mon + Thu (needs the `ANTHROPIC_API_KEY` secret to run). Full session-by-session history in `handoffs/`.

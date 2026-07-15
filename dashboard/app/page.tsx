@@ -323,7 +323,7 @@ export default function DashboardPage() {
         {tab === "brief" && (
           <div>
             <div className="page-title">Market Brief</div>
-            <div className="page-subtitle">Directional market read from the scheduled agent (Mon/Wed/Fri).</div>
+            <div className="page-subtitle">Directional market read from the scheduled agent (Mon + Thu).</div>
             <div className="brief-run">
               <button className="btn-primary" style={{ margin: 0 }} disabled={briefRunning} onClick={runBriefNow}>
                 {briefRunning ? "Triggering…" : "Run brief now"}
@@ -788,7 +788,7 @@ function BriefTab({ briefs }: { briefs: Brief[] }) {
     return (
       <div className="list-panel">
         <div className="roadmap-empty">
-          No briefs yet. The scheduled agent writes one Mon/Wed/Fri (once the ANTHROPIC_API_KEY secret is set), or run it
+          No briefs yet. The scheduled agent writes one Mon + Thu (once the ANTHROPIC_API_KEY secret is set), or run it
           on demand from the repo&apos;s Actions tab.
         </div>
       </div>

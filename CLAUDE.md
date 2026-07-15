@@ -40,7 +40,7 @@ Every position gets exactly one tag:
 
 ## Commands
 - `npm run dev` — run the dashboard
-- `node scripts/market-brief.mjs` — generate a dated market brief into `data/briefs/` (needs `ANTHROPIC_API_KEY`; runs automatically via GitHub Actions Mon/Wed/Fri)
+- `node scripts/market-brief.mjs` — generate a dated market brief into `data/briefs/` (needs `ANTHROPIC_API_KEY`; runs automatically via GitHub Actions Mon + Thu)
 
 ## Never
 - No credit card numbers, bank info, or payment credentials in the repo
