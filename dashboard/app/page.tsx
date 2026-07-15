@@ -520,8 +520,9 @@ function TicketRow({
   const netInfo =
     proceedsPerTkt != null
       ? {
-          proceeds: proceedsPerTkt,
-          profit: (proceedsPerTkt - p.face) * p.qty,
+          proceeds: proceedsPerTkt, // net/tk after fees
+          profitPerTkt: proceedsPerTkt - p.face,
+          profitTotal: (proceedsPerTkt - p.face) * p.qty,
           roi: ((proceedsPerTkt - p.face) / p.face) * 100,
         }
       : null;
@@ -547,8 +548,8 @@ function TicketRow({
         </div>
       </div>
 
-      <span className="ticket-figure">Cost: <strong>${p.face.toFixed(0)}</strong></span>
-      {p.ask != null && <span className="ticket-figure">Ask: <strong style={{ color: "#F0C040" }}>${p.ask}</strong></span>}
+      <span className="ticket-figure">Cost/tk: <strong>${p.face.toFixed(0)}</strong></span>
+      {p.ask != null && <span className="ticket-figure">Ask/tk: <strong style={{ color: "#F0C040" }}>${p.ask}</strong></span>}
       {p.platform && (
         <span
           className="badge-platform"
@@ -562,12 +563,21 @@ function TicketRow({
         </span>
       )}
       {netInfo && (
-        <span className="ticket-figure">
-          Net: <strong style={{ color: "#4ade80" }}>${netInfo.proceeds.toFixed(0)}/tkt</strong>
-          <span style={{ color: netInfo.profit >= 0 ? "#4ade80" : "#f87171" }}>
-            {" "}· P/L {netInfo.profit >= 0 ? "+" : ""}${netInfo.profit.toFixed(0)} ({netInfo.roi.toFixed(0)}%)
+        <>
+          <span className="ticket-figure">Net/tk: <strong style={{ color: "#4ade80" }}>${netInfo.proceeds.toFixed(0)}</strong></span>
+          <span className="ticket-figure">
+            Profit/tk:{" "}
+            <strong style={{ color: netInfo.profitPerTkt >= 0 ? "#4ade80" : "#f87171" }}>
+              {netInfo.profitPerTkt >= 0 ? "+" : ""}${netInfo.profitPerTkt.toFixed(0)} ({netInfo.roi.toFixed(0)}%)
+            </strong>
           </span>
-        </span>
+          <span className="ticket-figure">
+            Profit total:{" "}
+            <strong style={{ color: netInfo.profitTotal >= 0 ? "#4ade80" : "#f87171" }}>
+              {netInfo.profitTotal >= 0 ? "+" : ""}${netInfo.profitTotal.toFixed(0)}
+            </strong>
+          </span>
+        </>
       )}
       {p.status !== "sold" && (
         <span className="ticket-urgency" style={{ color: urgencyColor(days) }}>{urgencyLabel(days)}</span>
