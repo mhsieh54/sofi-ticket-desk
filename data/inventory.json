@@ -166,7 +166,8 @@
       "targetPlatform": "Ticketmaster",
       "targetSellDate": "2026-07-16",
       "clientReserved": 0,
-      "notes": "Moved to tickpick, price too high on ticketmaster not moving."
+      "notes": "Moved to tickpick, price too high on ticketmaster not moving.",
+      "askSetAt": "2026-07-15"
     },
     {
       "id": 15,
