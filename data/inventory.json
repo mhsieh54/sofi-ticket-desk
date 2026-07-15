@@ -191,7 +191,8 @@
       "targetPlatform": "StubHub",
       "targetSellDate": "2026-07-16",
       "clientReserved": 0,
-      "notes": "moved to tickpick, priced to move."
+      "notes": "moved to tickpick, priced to move.",
+      "askSetAt": "2026-07-15"
     },
     {
       "id": 16,
