@@ -377,9 +377,9 @@
       "face": 592,
       "fmv": null,
       "category": "SELL",
-      "status": "held",
-      "platform": null,
-      "ask": null,
+      "status": "listed",
+      "platform": "Direct",
+      "ask": 680,
       "sold": false,
       "soldDate": null,
       "soldPayout": null,
@@ -388,7 +388,8 @@
       "targetPlatform": "StubHub",
       "targetSellDate": "2026-11-03",
       "clientReserved": 0,
-      "notes": "TNF premium game. Target ROI 22% — accepted below the 30% floor rule as a confirmed capital-preservation sell."
+      "notes": "TNF premium game. Target ROI 22% — accepted below the 30% floor rule as a confirmed capital-preservation sell.",
+      "askSetAt": "2026-07-15"
     },
     {
       "id": 24,
