@@ -120,7 +120,8 @@
       "targetPlatform": "Vivid Seats",
       "targetSellDate": null,
       "clientReserved": 4,
-      "notes": "Listed for sale, but if selling at lost can pull from resale market, reserved for client entertainment. Bill company at FMV ~$275/tkt = $1,100."
+      "notes": "Listed for sale, but if selling at lost can pull from resale market, reserved for client entertainment. Bill company at FMV ~$275/tkt = $1,100.",
+      "askSetAt": "2026-07-15"
     },
     {
       "id": 13,
