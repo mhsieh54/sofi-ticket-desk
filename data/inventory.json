@@ -204,8 +204,8 @@
       "fmv": null,
       "category": "SELL",
       "status": "listed",
-      "platform": "Ticketmaster",
-      "ask": 990,
+      "platform": "TickPick",
+      "ask": 792,
       "sold": false,
       "soldDate": null,
       "soldPayout": null,
@@ -214,7 +214,7 @@
       "targetPlatform": "Vivid Seats",
       "targetSellDate": "2026-07-16",
       "clientReserved": 0,
-      "notes": "Listed on Ticketmaster despite 22% buyer fee — floor trades 2-3x average, defensible premium. All-in buyer cost ~$1,208."
+      "notes": "moved to tickpick. priced low to move, monitor to see if i should raise."
     },
     {
       "id": 17,
