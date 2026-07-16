@@ -37,7 +37,7 @@
       "category": "SELL",
       "status": "listed",
       "platform": "Vivid Seats",
-      "ask": 675,
+      "ask": 649,
       "sold": false,
       "soldDate": null,
       "soldPayout": null,
@@ -47,7 +47,7 @@
       "targetSellDate": "2026-07-26",
       "clientReserved": 0,
       "notes": "Target revised down from $675 to $475. Saturday date has highest floor of the 4 LA nights.",
-      "askSetAt": "2026-07-15"
+      "askSetAt": "2026-07-16"
     },
     {
       "id": 10,
