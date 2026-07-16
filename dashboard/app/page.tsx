@@ -215,9 +215,10 @@ export default function DashboardPage() {
   const footballPositions = sortedInventory.filter((p) => p.event.startsWith("Rams"));
   const timeline = buildTimeline(inventory);
 
+  const soldQty = sold.reduce((s, p) => s + p.qty, 0);
   const soldTotalCost = sold.reduce((s, p) => s + p.face * p.qty, 0);
-  const soldTotalPayout = sold.reduce((s, p) => s + (p.soldPayout ?? 0) * p.qty, 0);
-  const soldROI = soldTotalCost > 0 ? (realizedProfit / soldTotalCost) * 100 : 0;
+  const soldGross = sold.reduce((s, p) => s + (p.ask ?? 0) * p.qty, 0); // gross sale price, before fees
+  const soldTotalPayout = sold.reduce((s, p) => s + (p.soldPayout ?? 0) * p.qty, 0); // net, after fees
   const sortedSold = [...sold].sort((a, b) => (b.soldDate || "").localeCompare(a.soldDate || ""));
 
   // Simple ROI on realized trades — more honest than annualizing a short
@@ -383,17 +384,18 @@ export default function DashboardPage() {
             <div className="page-subtitle">Realized sales — closed-out positions with actual net/profit.</div>
 
             <div className="stats">
+              <StatCard label="Tickets Sold" value={String(soldQty)} sub={`${sold.length} positions`} />
+              <StatCard label="Total Cost" value={`$${soldTotalCost.toLocaleString(undefined, { maximumFractionDigits: 0 })}`} sub="cost basis" />
+              <StatCard label="Gross Sales" value={`$${soldGross.toLocaleString(undefined, { maximumFractionDigits: 0 })}`} accent="#F0C040" sub="before fees" />
+              <StatCard label="Net Proceeds" value={`$${soldTotalPayout.toLocaleString(undefined, { maximumFractionDigits: 0 })}`} accent="#60a5fa" sub="after platform fees" />
               <StatCard
                 label="Realized P&L"
-                value={`$${realizedProfit.toFixed(0)}`}
+                value={`$${realizedProfit.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
                 accent={realizedProfit >= 0 ? "#4ade80" : "#f87171"}
                 rate={fmtPct(realizedROI)}
                 rateLabel="ROI"
-                sub={`${sold.length} sold`}
+                sub="net − cost"
               />
-              <StatCard label="Total Cost" value={`$${soldTotalCost.toLocaleString(undefined, { maximumFractionDigits: 0 })}`} />
-              <StatCard label="Total Payout" value={`$${soldTotalPayout.toLocaleString(undefined, { maximumFractionDigits: 0 })}`} accent="#60a5fa" />
-              <StatCard label="Blended ROI" value={`${soldROI.toFixed(0)}%`} accent="#F0C040" />
             </div>
 
             <div className="list-panel">
@@ -732,8 +734,10 @@ function NetPreview({
 }
 
 function SoldRow({ p }: { p: Position }) {
-  const profit = p.soldPayout != null ? (p.soldPayout - p.face) * p.qty : 0;
-  const roi = p.soldPayout != null ? ((p.soldPayout - p.face) / p.face) * 100 : 0;
+  const proceeds = p.soldPayout ?? 0; // net per ticket after fees
+  const profitPerTkt = proceeds - p.face;
+  const profitTotal = profitPerTkt * p.qty;
+  const roi = p.face ? (profitPerTkt / p.face) * 100 : 0;
 
   return (
     <div className="ticket-row">
@@ -756,8 +760,8 @@ function SoldRow({ p }: { p: Position }) {
         </div>
       </div>
 
-      <span className="ticket-figure">Cost: <strong>${p.face.toFixed(0)}</strong></span>
-      <span className="ticket-figure">Sold: <strong style={{ color: "#F0C040" }}>${p.ask}</strong></span>
+      <span className="ticket-figure">Cost/tk: <strong>${p.face.toFixed(0)}</strong></span>
+      <span className="ticket-figure">Sold/tk: <strong style={{ color: "#F0C040" }}>${p.ask}</strong></span>
       {p.platform && (
         <span
           className="badge-platform"
@@ -770,9 +774,17 @@ function SoldRow({ p }: { p: Position }) {
           {p.platform}
         </span>
       )}
+      <span className="ticket-figure">Net/tk: <strong style={{ color: "#4ade80" }}>${proceeds.toFixed(0)}</strong></span>
       <span className="ticket-figure">
-        Net: <strong style={{ color: profit >= 0 ? "#4ade80" : "#f87171" }}>
-          {profit >= 0 ? "+" : ""}${profit.toFixed(0)} ({roi.toFixed(0)}% ROI)
+        Profit/tk:{" "}
+        <strong style={{ color: profitPerTkt >= 0 ? "#4ade80" : "#f87171" }}>
+          {profitPerTkt >= 0 ? "+" : ""}${profitPerTkt.toFixed(0)} ({roi.toFixed(0)}%)
+        </strong>
+      </span>
+      <span className="ticket-figure">
+        Profit total:{" "}
+        <strong style={{ color: profitTotal >= 0 ? "#4ade80" : "#f87171" }}>
+          {profitTotal >= 0 ? "+" : ""}${profitTotal.toFixed(0)}
         </strong>
       </span>
 
