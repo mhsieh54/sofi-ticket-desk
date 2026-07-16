@@ -122,7 +122,7 @@ function buildTimeline(inventory: Position[]): TimelineItem[] {
   return items;
 }
 
-type Tab = "overview" | "brief" | "inventory" | "football" | "sold";
+type Tab = "overview" | "brief" | "inventory" | "football" | "sold" | "upload";
 
 export default function DashboardPage() {
   const [inventory, setInventory] = useState<Position[] | null>(null);
@@ -281,6 +281,7 @@ export default function DashboardPage() {
         <button className={`tab-btn ${tab === "inventory" ? "active" : ""}`} onClick={() => setTab("inventory")}>Inventory</button>
         <button className={`tab-btn ${tab === "football" ? "active" : ""}`} onClick={() => setTab("football")}>Football</button>
         <button className={`tab-btn ${tab === "sold" ? "active" : ""}`} onClick={() => setTab("sold")}>Sold</button>
+        <button className={`tab-btn ${tab === "upload" ? "active" : ""}`} onClick={() => setTab("upload")}>Upload</button>
       </nav>
 
       <div className="page-inner">
@@ -408,6 +409,22 @@ export default function DashboardPage() {
                 sortedSold.map((p) => <SoldRow key={p.id} p={p} />)
               )}
             </div>
+          </div>
+        )}
+
+        {tab === "upload" && (
+          <div>
+            <div className="page-title">Upload</div>
+            <div className="page-subtitle">
+              Upload a purchase receipt or ticket screenshot — Claude parses it into a draft you review, then adds to
+              inventory. The image is processed transiently and never stored.
+            </div>
+            <UploadTab
+              onAdded={() => {
+                load();
+                setTab("inventory");
+              }}
+            />
           </div>
         )}
       </div>
@@ -894,4 +911,179 @@ function Markdown({ text }: { text: string }) {
   flushList("ul-end");
 
   return <>{out}</>;
+}
+
+interface Draft {
+  event: string;
+  date: string;
+  section: string;
+  row: string;
+  seats: string;
+  qty: string;
+  face: string;
+  category: Category;
+  notes: string;
+  purchaseDate: string;
+}
+
+function fileToBase64(file: File): Promise<{ data: string; mediaType: string }> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string; // "data:<mime>;base64,<data>"
+      const comma = result.indexOf(",");
+      resolve({ data: result.slice(comma + 1), mediaType: file.type });
+    };
+    reader.onerror = () => reject(new Error("Could not read the file."));
+    reader.readAsDataURL(file);
+  });
+}
+
+function UploadTab({ onAdded }: { onAdded: () => void }) {
+  const [file, setFile] = useState<File | null>(null);
+  const [parsing, setParsing] = useState(false);
+  const [adding, setAdding] = useState(false);
+  const [error, setError] = useState("");
+  const [drafts, setDrafts] = useState<Draft[] | null>(null);
+
+  async function parse() {
+    if (!file) return;
+    setParsing(true);
+    setError("");
+    setDrafts(null);
+    try {
+      const { data, mediaType } = await fileToBase64(file);
+      const res = await fetch("/api/parse-ticket", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data, mediaType }),
+      });
+      const body = await res.json();
+      if (!res.ok) {
+        setError(body.error || "Parse failed.");
+      } else {
+        const parsed: Draft[] = (body.positions || []).map((p: any) => ({
+          event: p.event ?? "",
+          date: p.date ?? "",
+          section: p.section ?? "",
+          row: p.row ?? "",
+          seats: p.seats ?? "",
+          qty: p.qty != null ? String(p.qty) : "1",
+          face: p.face != null ? String(p.face) : "",
+          category: "SELL" as Category,
+          notes: p.notes ?? "",
+          purchaseDate: p.purchaseDate ?? "",
+        }));
+        if (parsed.length === 0) setError("No ticket details found in that file.");
+        setDrafts(parsed);
+      }
+    } catch (err: any) {
+      setError(err.message || "Parse failed.");
+    }
+    setParsing(false);
+  }
+
+  function updateDraft(i: number, patch: Partial<Draft>) {
+    setDrafts((d) => (d ? d.map((x, j) => (j === i ? { ...x, ...patch } : x)) : d));
+  }
+  function removeDraft(i: number) {
+    setDrafts((d) => (d ? d.filter((_, j) => j !== i) : d));
+  }
+
+  async function add() {
+    if (!drafts || drafts.length === 0) return;
+    setAdding(true);
+    setError("");
+    const payload = drafts.map((d) => ({
+      event: d.event,
+      date: d.date,
+      section: d.section,
+      row: d.row,
+      seats: d.seats,
+      qty: Number(d.qty) || 1,
+      face: Number(d.face) || 0,
+      category: d.category,
+      notes: d.notes || null,
+      purchaseDate: d.purchaseDate,
+    }));
+    const res = await fetch("/api/positions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ positions: payload }),
+    });
+    setAdding(false);
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      setError(body.error || "Failed to add.");
+    } else {
+      onAdded();
+    }
+  }
+
+  return (
+    <div>
+      {error && <div className="banner-error">{error}</div>}
+
+      <div className="comp-form" style={{ marginBottom: 16 }}>
+        <label>
+          Receipt or ticket screenshot (image or PDF)
+          <input
+            type="file"
+            accept="image/*,application/pdf"
+            onChange={(e) => {
+              setFile(e.target.files?.[0] ?? null);
+              setDrafts(null);
+              setError("");
+            }}
+          />
+        </label>
+        <button className="btn-primary" disabled={!file || parsing} onClick={parse}>
+          {parsing ? "Parsing with Claude…" : "Parse receipt"}
+        </button>
+      </div>
+
+      {drafts && drafts.length > 0 && (
+        <div className="list-panel">
+          <div className="list-panel-header">
+            <span className="list-panel-label">Review before adding ({drafts.length})</span>
+          </div>
+          {drafts.map((d, i) => (
+            <div key={i} className="edit-form" style={{ margin: "10px 14px" }}>
+              <label>Event<input value={d.event} onChange={(e) => updateDraft(i, { event: e.target.value })} /></label>
+              <div className="comp-form-row">
+                <label>Event date<input value={d.date} onChange={(e) => updateDraft(i, { date: e.target.value })} placeholder="YYYY-MM-DD" /></label>
+                <label>Section<input value={d.section} onChange={(e) => updateDraft(i, { section: e.target.value })} /></label>
+              </div>
+              <div className="comp-form-row">
+                <label>Row<input value={d.row} onChange={(e) => updateDraft(i, { row: e.target.value })} /></label>
+                <label>Seats<input value={d.seats} onChange={(e) => updateDraft(i, { seats: e.target.value })} /></label>
+              </div>
+              <div className="comp-form-row">
+                <label>Qty<input inputMode="numeric" value={d.qty} onChange={(e) => updateDraft(i, { qty: e.target.value })} /></label>
+                <label>Cost/tk (true cost)<input inputMode="decimal" value={d.face} onChange={(e) => updateDraft(i, { face: e.target.value })} /></label>
+                <label>
+                  Category
+                  <select value={d.category} onChange={(e) => updateDraft(i, { category: e.target.value as Category })}>
+                    {(["SELL", "ATTEND", "CLIENT", "KEEP"] as Category[]).map((c) => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+              <label>Purchase date<input value={d.purchaseDate} onChange={(e) => updateDraft(i, { purchaseDate: e.target.value })} placeholder="YYYY-MM-DD (defaults to today)" /></label>
+              <label>Notes<textarea rows={2} value={d.notes} onChange={(e) => updateDraft(i, { notes: e.target.value })} /></label>
+              {drafts.length > 1 && (
+                <button className="btn-small" style={{ alignSelf: "flex-start" }} onClick={() => removeDraft(i)}>Remove</button>
+              )}
+            </div>
+          ))}
+          <div style={{ padding: "6px 14px 14px" }}>
+            <button className="btn-primary" style={{ margin: 0 }} disabled={adding} onClick={add}>
+              {adding ? "Adding…" : `Add ${drafts.length} to inventory`}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }

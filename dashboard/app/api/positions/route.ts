@@ -15,6 +15,64 @@ export async function GET() {
   return NextResponse.json({ inventory, sold, briefNotes });
 }
 
+// Adds one or more reviewed draft positions to inventory (from the Upload
+// tab). Assigns fresh ids (unique across inventory + sold) and fills schema
+// defaults; only the user-reviewed fields come from the request.
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json();
+    const incoming: any[] = Array.isArray(body.positions) ? body.positions : [];
+    if (incoming.length === 0) {
+      return NextResponse.json({ error: "No positions to add." }, { status: 400 });
+    }
+
+    const inv = await getFile(INVENTORY_PATH);
+    const soldFile = await getFile(SOLD_PATH);
+    const positions = inv.content.positions as any[];
+    const allIds = [...positions, ...soldFile.content.positions].map((p: any) => p.id);
+    let nextId = allIds.length ? Math.max(...allIds) + 1 : 1;
+    const today = new Date().toISOString().slice(0, 10);
+
+    const added = incoming.map((pos) => ({
+      id: nextId++,
+      event: (pos.event ?? "").toString(),
+      date: (pos.date ?? "").toString(),
+      section: (pos.section ?? "").toString(),
+      row: (pos.row ?? "").toString(),
+      seats: pos.seats ? pos.seats.toString() : "—",
+      qty: Number(pos.qty) || 1,
+      face: Number(pos.face) || 0,
+      fmv: null,
+      category: ["SELL", "ATTEND", "CLIENT", "KEEP"].includes(pos.category) ? pos.category : "SELL",
+      status: "held",
+      platform: null,
+      ask: null,
+      sold: false,
+      soldDate: null,
+      soldPayout: null,
+      purchaseDate: (pos.purchaseDate || today).toString(),
+      targetAsk: null,
+      targetPlatform: null,
+      targetSellDate: null,
+      clientReserved: 0,
+      notes: pos.notes ? pos.notes.toString() : null,
+    }));
+
+    const newInventory = [...positions, ...added];
+    await putFile(
+      INVENTORY_PATH,
+      { positions: newInventory },
+      inv.sha,
+      `Add ${added.length} position(s) from receipt upload`
+    );
+
+    const soldPositions = await readPositions("sold");
+    return NextResponse.json({ inventory: newInventory, sold: soldPositions, added: added.length });
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message || "Failed to add positions." }, { status: 500 });
+  }
+}
+
 export async function PATCH(req: NextRequest) {
   try {
     const body = await req.json();
