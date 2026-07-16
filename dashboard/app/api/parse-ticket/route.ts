@@ -10,6 +10,21 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const maxDuration = 60; // vision + structured output can take a while
 
+// Diagnostic: reports whether the running deployment can see the API key,
+// WITHOUT ever exposing the key itself (boolean + length only). Also reports
+// the live git commit and Vercel environment so we can confirm which build is
+// actually serving. Safe to remove once the upload feature is confirmed working.
+export async function GET() {
+  const key = process.env.ANTHROPIC_API_KEY || "";
+  return NextResponse.json({
+    keyPresent: key.length > 0,
+    keyLength: key.length,
+    parseModel: process.env.PARSE_MODEL || "claude-haiku-4-5",
+    vercelEnv: process.env.VERCEL_ENV || "(none)",
+    commit: (process.env.VERCEL_GIT_COMMIT_SHA || "(unknown)").slice(0, 7),
+  });
+}
+
 const SCHEMA = {
   type: "object",
   properties: {
