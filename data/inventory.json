@@ -570,9 +570,9 @@
       "face": 71,
       "fmv": null,
       "category": "SELL",
-      "status": "held",
-      "platform": null,
-      "ask": null,
+      "status": "listed",
+      "platform": "StubHub",
+      "ask": 140,
       "sold": false,
       "soldDate": null,
       "soldPayout": null,
@@ -581,7 +581,8 @@
       "targetPlatform": null,
       "targetSellDate": null,
       "clientReserved": 0,
-      "notes": "Lot ORANGE, no tailgating. 1 of 9-pass season bundle ($639 ÷ 9 = $71/pass). Pairs with the Packers game (for sale) — Thanksgiving Eve premium. Acct #18848266."
+      "notes": "Lot ORANGE, no tailgating. 1 of 9-pass season bundle ($639 ÷ 9 = $71/pass). Pairs with the Packers game (for sale) — Thanksgiving Eve premium. Acct #18848266.",
+      "askSetAt": "2026-07-16"
     },
     {
       "id": 33,
