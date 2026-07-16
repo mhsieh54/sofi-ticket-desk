@@ -181,16 +181,16 @@
       "category": "SELL",
       "status": "sold",
       "platform": "Vivid Seats",
-      "ask": 475,
+      "ask": 550,
       "sold": true,
       "soldDate": "2026-07-16",
-      "soldPayout": 427.5,
+      "soldPayout": 495,
       "purchaseDate": "2026-01-21",
       "targetAsk": 475,
       "targetPlatform": "Vivid Seats",
       "targetSellDate": "2026-07-26",
       "clientReserved": 0,
-      "notes": "Target revised down from $675 to $475 — LA supply heavier than expected. Confirmed ceiling: do not exceed $625 ask (ARMY boycott risk).",
+      "notes": "Sold $550/tkt on Vivid Seats (10% fee) → net $495/tkt. +$615.50 pair profit, 164% ROI. Beat the $475 target.",
       "askSetAt": "2026-07-15"
     }
   ]
