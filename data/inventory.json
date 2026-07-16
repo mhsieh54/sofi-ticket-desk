@@ -328,9 +328,9 @@
       "face": 625,
       "fmv": null,
       "category": "SELL",
-      "status": "held",
-      "platform": null,
-      "ask": null,
+      "status": "listed",
+      "platform": "StubHub",
+      "ask": 1000,
       "sold": false,
       "soldDate": null,
       "soldPayout": null,
@@ -339,7 +339,8 @@
       "targetPlatform": "StubHub",
       "targetSellDate": "2026-10-26",
       "clientReserved": 0,
-      "notes": "Thanksgiving Eve — target revised up to $1,000. 36% ROI, meets 30% floor."
+      "notes": "Thanksgiving Eve — target revised up to $1,000. 36% ROI, meets 30% floor.",
+      "askSetAt": "2026-07-16"
     },
     {
       "id": 23,
