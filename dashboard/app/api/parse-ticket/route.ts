@@ -5,8 +5,8 @@ import { NextRequest, NextResponse } from "next/server";
 // anything — it returns a draft the user reviews and confirms client-side.
 //
 // Needs ANTHROPIC_API_KEY in the environment (add it to the Vercel project).
-// PARSE_MODEL overrides the model (default claude-opus-4-8; claude-haiku-4-5
-// is faster + cheaper and plenty for receipts).
+// PARSE_MODEL overrides the model (default claude-haiku-4-5 — fast, cheap, and
+// plenty for receipt parsing; it supports vision + structured outputs).
 
 export const maxDuration = 60; // vision + structured output can take a while
 
@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
         "content-type": "application/json",
       },
       body: JSON.stringify({
-        model: process.env.PARSE_MODEL || "claude-opus-4-8",
+        model: process.env.PARSE_MODEL || "claude-haiku-4-5",
         max_tokens: 2000,
         output_config: { format: { type: "json_schema", schema: SCHEMA } },
         messages: [{ role: "user", content: [fileBlock, { type: "text", text: PROMPT }] }],
