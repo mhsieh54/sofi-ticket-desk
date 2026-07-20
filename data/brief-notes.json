@@ -1,16 +1,20 @@
 {
-  "generatedAt": "2026-07-16",
+  "generatedAt": "2026-07-20",
   "notes": {
-    "9": "Cut to $625 hard ceiling on Vivid today ($649 violates it). Stay on Vivid; ignore $475 StubHub target.",
-    "11": "Hold at $275 on Vivid; no sell-by. Don't list below ~$236 (net=cost). Watch 11/15 show for softness.",
-    "13": "Hold at $744 on TickPick (=target). Sell-by 8/27; trim first if stalls into Aug, floor ~$589.",
-    "14": "Hold at $648 on TickPick today; reject $720 TM raise. Trim floor ~$530 if unsold by mid-afternoon. Sell-by today.",
-    "15": "Hold at $719 on TickPick today; reject $800 StubHub raise. Trim floor ~$530 if unsold. Sell-by today.",
-    "16": "Hold at $792 on TickPick today; reject $850 Vivid raise. Trim floor ~$605. Protect the sale. Sell-by today.",
-    "21": "List now ~$485 on TickPick (net ~$412); hard floor $441. Softest game—keep expectations tempered.",
-    "22": "List now at $1,000 on StubHub (net $850); price 2nd-3rd cheapest. Sell-by 10/26; don't sit into Oct.",
-    "23": "Move to StubHub at $850 (net $722.50) off Direct $680; or reprice Direct to ~$800+. $680 too low.",
-    "24": "List now on StubHub—start at $1,050, settle to 2nd-3rd cheapest. Top-demand game; sell-by 11/20.",
-    "26": "List now at $600 on StubHub (net $510); price 2nd-3rd cheapest. Trim toward ~$500 as 12/15 nears."
+    "9": "Cut to $625 on Vivid today (breaches $625 ceiling); stay Vivid, nets $562 vs StubHub $531.",
+    "11": "Hold $275 on Vivid; if still sitting 3wks out cut to ~$250, floor $236.",
+    "13": "Hold $744 on TickPick (nets ~$632); sell-by 8/27. No change.",
+    "14": "Drop $720 TM target; keep TickPick, hold $648 48h then cut toward $600, floor $530.",
+    "15": "Abandon $800 target; hold $719 TickPick 48h, cut to ~$650 if no bites. Don't reprice up.",
+    "16": "Keep TickPick @ $792 (nets ~$673) to guarantee sale; Vivid $850 only if same-day flip.",
+    "21": "List now $475 on StubHub (nets ~$404); floor $441. Get it live early.",
+    "22": "Hold $1000 on StubHub (nets $850); sell-by 10/26. No change.",
+    "23": "Relist at $850 on StubHub (nets $722); fallback $680 Direct near sell-by 11/3.",
+    "24": "List now $1000 on StubHub (nets $850); room to test $1050 if it bites fast.",
+    "26": "List now $600 on StubHub (nets $510); step down to ~$550 by early Dec, floor $501.",
+    "31": "List $110 on StubHub (nets ~$94); don't overprice low-demand game.",
+    "32": "Hold $140 on StubHub (nets $119). Fine for high-demand date.",
+    "33": "Bump to $130 on StubHub (nets ~$110). Marquee-game parking carries.",
+    "34": "List $140 on StubHub (nets $119). Cowboys parking is a strong flip."
   }
 }
