@@ -160,7 +160,7 @@
       "category": "SELL",
       "status": "listed",
       "platform": "TickPick",
-      "ask": 719,
+      "ask": 675,
       "sold": false,
       "soldDate": null,
       "soldPayout": null,
@@ -170,7 +170,7 @@
       "targetSellDate": "2026-07-16",
       "clientReserved": 0,
       "notes": "moved to tickpick, priced to move.",
-      "askSetAt": "2026-07-15"
+      "askSetAt": "2026-07-28"
     },
     {
       "id": 16,
