@@ -83,9 +83,9 @@
       "qty": 4,
       "face": 212.3,
       "fmv": 275,
-      "category": "SELL",
+      "category": "CLIENT",
       "status": "listed",
-      "platform": "Vivid Seats",
+      "platform": "Direct",
       "ask": 275,
       "sold": false,
       "soldDate": null,
@@ -96,7 +96,7 @@
       "targetSellDate": null,
       "clientReserved": 4,
       "notes": "Listed for sale, but if selling at lost can pull from resale market, reserved for client entertainment. Bill company at FMV ~$275/tkt = $1,100.",
-      "askSetAt": "2026-07-15"
+      "askSetAt": "2026-07-28"
     },
     {
       "id": 13,
