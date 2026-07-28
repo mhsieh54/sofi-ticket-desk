@@ -111,7 +111,7 @@
       "category": "SELL",
       "status": "listed",
       "platform": "TickPick",
-      "ask": 744,
+      "ask": 798,
       "sold": false,
       "soldDate": null,
       "soldPayout": null,
@@ -120,7 +120,8 @@
       "targetPlatform": "TickPick",
       "targetSellDate": "2026-08-27",
       "clientReserved": 0,
-      "notes": "Largest single position by capital ($2,001). Dropped $901→$799→$744. Floor exit at $599 (10% ROI) to preserve capital."
+      "notes": "Largest single position by capital ($2,001). Dropped $901→$799→$744. Floor exit at $599 (10% ROI) to preserve capital.",
+      "askSetAt": "2026-07-28"
     },
     {
       "id": 14,
