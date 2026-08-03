@@ -10,16 +10,42 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const maxDuration = 60; // vision + structured output can take a while
 
-// Diagnostic: reports whether the running deployment can see the API key,
-// WITHOUT ever exposing the key itself (boolean + length only). Also reports
-// the live git commit and Vercel environment so we can confirm which build is
-// actually serving. Safe to remove once the upload feature is confirmed working.
+// Diagnostic: reports whether the running deployment can see its secrets,
+// WITHOUT ever exposing them (booleans + lengths only). Also live-tests the
+// GitHub token against the repo so we can tell a valid token from a stale one,
+// and reports the live git commit + Vercel environment to confirm which build
+// is serving. Safe to remove once upload is confirmed working end to end.
 export async function GET() {
   const key = process.env.ANTHROPIC_API_KEY || "";
+  const ghToken = process.env.GITHUB_TOKEN || "";
+  const owner = process.env.GITHUB_OWNER || "";
+  const repo = process.env.GITHUB_REPO || "";
+
+  // Actually authenticate the GitHub token: "ok" means writes will work,
+  // "401" means the token Vercel holds is invalid/stale (regenerate mismatch).
+  let githubAuth = "no-token";
+  if (ghToken && owner && repo) {
+    try {
+      const r = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
+        headers: {
+          Authorization: `Bearer ${ghToken}`,
+          Accept: "application/vnd.github+json",
+          "X-GitHub-Api-Version": "2022-11-28",
+        },
+      });
+      githubAuth = r.ok ? "ok" : String(r.status);
+    } catch {
+      githubAuth = "error";
+    }
+  }
+
   return NextResponse.json({
     keyPresent: key.length > 0,
     keyLength: key.length,
     parseModel: process.env.PARSE_MODEL || "claude-haiku-4-5",
+    githubTokenPresent: ghToken.length > 0,
+    githubTokenLength: ghToken.length,
+    githubAuth,
     vercelEnv: process.env.VERCEL_ENV || "(none)",
     commit: (process.env.VERCEL_GIT_COMMIT_SHA || "(unknown)").slice(0, 7),
   });
