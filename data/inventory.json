@@ -699,11 +699,12 @@
       "soldDate": null,
       "soldPayout": null,
       "purchaseDate": "2026-08-03",
-      "targetAsk": null,
-      "targetPlatform": null,
+      "targetAsk": 500,
+      "targetPlatform": "Ticketmaster",
       "targetSellDate": null,
       "clientReserved": 0,
-      "notes": "Order #391744063, Rose Bowl Stadium"
+      "notes": "Order #391744063, Rose Bowl Stadium",
+      "askSetAt": null
     }
   ]
 }
