@@ -69,6 +69,10 @@ function shortEventTag(event: string, date: string): string {
   return `${short} ${monthDay}`;
 }
 
+function shortDate(date: string): string {
+  return new Date(date + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
 function monthLabel(m: string): string {
   const [y, mo] = m.split("-").map(Number);
   return new Date(y, mo - 1, 1)
@@ -93,18 +97,36 @@ interface TimelineItem {
 // Built from live data (targetSellDate / event date), not hand-maintained —
 // only SELL positions with a target and CLIENT positions needing billing
 // generate an action; ATTEND/KEEP need no action so they're excluded.
+// An unsold SELL position stays a live to-do until it sells or the event
+// passes: if its target sell date has already slipped by, the action rolls
+// forward into the current month (flagged overdue) rather than aging off the
+// list — an unsold ticket near its event is more urgent, not less.
 function buildTimeline(inventory: Position[]): TimelineItem[] {
   const items: TimelineItem[] = [];
+  const nowMonth = new Date().toISOString().slice(0, 7);
+  const today = new Date().toISOString().slice(0, 10);
   for (const p of inventory) {
-    if (p.category === "SELL" && p.targetSellDate) {
-      items.push({
-        date: p.targetSellDate,
-        month: p.targetSellDate.slice(0, 7),
-        eventTag: shortEventTag(p.event, p.date),
-        text:
+    if (p.category === "SELL" && !p.sold && p.targetSellDate && p.date >= today) {
+      const targetMonth = p.targetSellDate.slice(0, 7);
+      const month = targetMonth < nowMonth ? nowMonth : targetMonth;
+      const overdue = p.targetSellDate < today;
+      let text: string;
+      if (overdue) {
+        text =
+          p.status === "listed"
+            ? `⚠ Unsold — cut price or switch platform. Listed on ${p.platform} @ $${p.ask}, event ${shortDate(p.date)}`
+            : `⚠ Not listed yet — list now, target $${p.targetAsk} on ${p.targetPlatform}, event ${shortDate(p.date)}`;
+      } else {
+        text =
           p.status === "listed"
             ? `Listed on ${p.platform} @ $${p.ask} — monitor and cut if stale`
-            : `List ${p.event} — target $${p.targetAsk} on ${p.targetPlatform}`,
+            : `List ${p.event} — target $${p.targetAsk} on ${p.targetPlatform}`;
+      }
+      items.push({
+        date: p.targetSellDate,
+        month,
+        eventTag: shortEventTag(p.event, p.date),
+        text,
         color: CATEGORY_COLOR.SELL,
       });
     }
@@ -319,6 +341,14 @@ export default function DashboardPage() {
 
             <div className="roadmap-heading">Monthly Action Roadmap</div>
             <MonthlyRoadmap items={timeline} />
+
+            <div className="roadmap-heading" style={{ marginTop: 28 }}>
+              Latest Market Brief
+              {briefs[0] ? (
+                <span style={{ color: "#8b8b8b", fontWeight: 400 }}> · {briefs[0].date}</span>
+              ) : null}
+            </div>
+            <OverviewBrief briefs={briefs} onOpenBrief={() => setTab("brief")} />
           </div>
         )}
 
@@ -806,6 +836,41 @@ function SoldRow({ p }: { p: Position }) {
       </span>
 
       {p.notes && <div className="ticket-notes">{p.notes}</div>}
+    </div>
+  );
+}
+
+// Latest brief, rendered inline on the Overview so the page is a single
+// command center: snapshot + roadmap + the newest market read. Full history
+// stays on the Brief tab.
+function OverviewBrief({ briefs, onOpenBrief }: { briefs: Brief[]; onOpenBrief: () => void }) {
+  if (briefs.length === 0) {
+    return (
+      <div className="roadmap-empty">
+        No brief yet — the agent writes one Mon + Thu, or trigger one from the Brief tab.
+      </div>
+    );
+  }
+  const brief = briefs[0];
+  return (
+    <div className="brief-panel">
+      <Markdown text={brief.content} />
+      {briefs.length > 1 && (
+        <button
+          onClick={onOpenBrief}
+          style={{
+            marginTop: 14,
+            background: "transparent",
+            border: "none",
+            color: "#F0C040",
+            cursor: "pointer",
+            padding: 0,
+            font: "inherit",
+          }}
+        >
+          View brief history →
+        </button>
+      )}
     </div>
   );
 }
