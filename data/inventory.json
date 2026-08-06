@@ -110,7 +110,7 @@
       "fmv": null,
       "category": "SELL",
       "status": "listed",
-      "platform": "TickPick",
+      "platform": "Direct",
       "ask": 744,
       "sold": false,
       "soldDate": null,
