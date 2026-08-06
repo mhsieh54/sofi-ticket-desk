@@ -186,7 +186,7 @@
       "category": "SELL",
       "status": "listed",
       "platform": "TickPick",
-      "ask": 732,
+      "ask": 698,
       "sold": false,
       "soldDate": null,
       "soldPayout": null,
@@ -196,7 +196,7 @@
       "targetSellDate": "2026-07-16",
       "clientReserved": 0,
       "notes": "moved to tickpick. priced low to move, monitor to see if i should raise.",
-      "askSetAt": "2026-07-28"
+      "askSetAt": "2026-08-06"
     },
     {
       "id": 17,
