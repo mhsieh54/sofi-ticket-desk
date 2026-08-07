@@ -10,7 +10,7 @@
       "qty": 4,
       "face": 187.25,
       "fmv": null,
-      "category": "KEEP",
+      "category": "ATTEND",
       "status": "held",
       "platform": null,
       "ask": null,
@@ -22,7 +22,8 @@
       "targetPlatform": null,
       "targetSellDate": null,
       "clientReserved": 0,
-      "notes": "Suni + 3"
+      "notes": "Suni + 3",
+      "askSetAt": null
     },
     {
       "id": 9,
