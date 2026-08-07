@@ -648,9 +648,9 @@
       "face": 341.85,
       "fmv": null,
       "category": "SELL",
-      "status": "held",
-      "platform": null,
-      "ask": null,
+      "status": "listed",
+      "platform": "TickPick",
+      "ask": 460,
       "sold": false,
       "soldDate": null,
       "soldPayout": null,
@@ -659,7 +659,8 @@
       "targetPlatform": null,
       "targetSellDate": null,
       "clientReserved": 0,
-      "notes": "Order #35-27620/WES, Seat License & Suite Member Presale"
+      "notes": "Order #35-27620/WES, Seat License & Suite Member Presale",
+      "askSetAt": "2026-08-07"
     },
     {
       "id": 38,
