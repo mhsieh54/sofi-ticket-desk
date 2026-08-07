@@ -450,10 +450,10 @@
       "qty": 1,
       "face": 71,
       "fmv": null,
-      "category": "CLIENT",
-      "status": "listed",
-      "platform": "Direct",
-      "ask": 75,
+      "category": "ATTEND",
+      "status": "held",
+      "platform": null,
+      "ask": null,
       "sold": false,
       "soldDate": null,
       "soldPayout": null,
@@ -463,7 +463,7 @@
       "targetSellDate": null,
       "clientReserved": 0,
       "notes": "Lot ORANGE, no tailgating. 1 of 9-pass season bundle ($639 ÷ 9 = $71/pass). Pairs with the Giants game (attending). Acct #18848266.",
-      "askSetAt": "2026-08-07"
+      "askSetAt": null
     },
     {
       "id": 29,
