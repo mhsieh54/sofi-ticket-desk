@@ -232,10 +232,10 @@
       "qty": 2,
       "face": 352,
       "fmv": null,
-      "category": "CLIENT",
-      "status": "listed",
-      "platform": "Direct",
-      "ask": 375,
+      "category": "ATTEND",
+      "status": "held",
+      "platform": null,
+      "ask": null,
       "sold": false,
       "soldDate": null,
       "soldPayout": null,
@@ -245,7 +245,7 @@
       "targetSellDate": null,
       "clientReserved": 0,
       "notes": "+ Hannah",
-      "askSetAt": "2026-08-07"
+      "askSetAt": null
     },
     {
       "id": 19,
