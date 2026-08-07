@@ -60,7 +60,7 @@
       "qty": 6,
       "face": 653.9,
       "fmv": null,
-      "category": "KEEP",
+      "category": "ATTEND",
       "status": "held",
       "platform": null,
       "ask": null,
@@ -72,7 +72,8 @@
       "targetPlatform": null,
       "targetSellDate": null,
       "clientReserved": 2,
-      "notes": "Hannah, Mark, Jimmy, Peggy, Helen, need a +1"
+      "notes": "Hannah, Mark, Jimmy, Peggy, Helen, need a +1",
+      "askSetAt": null
     },
     {
       "id": 11,
