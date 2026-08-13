@@ -1,20 +1,20 @@
 {
-  "generatedAt": "2026-08-10",
+  "generatedAt": "2026-08-13",
   "notes": {
-    "9": "Raise to $625 on Vivid (nets ~$562.50), drop StubHub. Do NOT exceed $625. Fall back to $590 if unsold by ~8/22.",
-    "14": "URGENT: Cut to $599 on TickPick (net ~$509). Move it before Saturday; if unsold by 8/13 cut to 2nd-cheapest floor.",
-    "15": "URGENT: Cut to $579 on TickPick (net ~$492). Sell before Saturday; if unsold by 8/13 cut to 2nd-cheapest floor.",
-    "16": "URGENT: Cut to $649 on TickPick (net ~$552). Floor holds premium but trim; if unsold by 8/13 cut further.",
-    "21": "List now at $525 on StubHub (net ~$446). Floor is cost $375; trim toward $450 as date nears.",
-    "22": "Hold at $1,000 on StubHub (net ~$850). Reassess early Oct; step down before 10/26 sell-by if no bites by ~Oct 15.",
-    "24": "List now at $1,000 on StubHub (net ~$850). Get up early to catch out-of-town Cowboys buyers.",
-    "26": "SELL: List now at $575 on StubHub (net ~$489). Step toward ~$500 breakeven by 12/15; never below $426.",
-    "31": "List now at $90 on Direct (net $90). Parking moves late; fine to sit into game week.",
-    "33": "Raise to $125 on Direct (net $125). Highest-demand parking; bump further if Chiefs in playoff contention.",
-    "34": "List now at $125 on Direct (net $125). Cowboys crowd travels; list into game-week ~11/15.",
-    "36": "Hold, raise to $525 on TickPick (net ~$446). Runway to test higher; revisit if quiet by late September.",
-    "37": "Hold, raise to $525 on TickPick (net ~$446). Runway to test higher; revisit if quiet by late September.",
-    "38": "Hold. No sell-by, no live market. Revisit 2027 once resale opens; verify venue (SoFi vs Rose Bowl). Target $500.",
-    "39": "Hold. No sell-by, no live market. Revisit 2027 once resale opens; verify venue (SoFi vs Rose Bowl). Target $500."
+    "9": "Keep on Vivid, cut $590 → $499 (nets ~$449). Don't push $625 StubHub. Revisit ~8/22.",
+    "14": "URGENT: Cut $598 → $559 on TickPick (nets ~$475, +$25). Move it now, 2 days out.",
+    "15": "URGENT: Cut $599 → $565 on TickPick (nets ~$480, +$30). Sell today.",
+    "16": "URGENT: Cut $768 → $639 on TickPick (nets ~$543, +$30). Undercut and go.",
+    "21": "List now ~$499 on StubHub (nets ~$424); step toward $441 breakeven if floor sits, not below cost.",
+    "22": "Hold $1,000 on StubHub (nets ~$850); reassess mid-Oct, trim toward ~$900 if flat by 10/26.",
+    "24": "List now $1,000 on StubHub (nets ~$850, +$143); hold the number into November, sell-by 11/20.",
+    "26": "List now $599 on StubHub (nets ~$509); flagged SELL. Step to ~$525 if unsold early Dec, sell-by 12/15.",
+    "31": "List now ~$110 on StubHub (nets ~$94) or $110 Direct to keep 100%.",
+    "33": "Raise to ~$135 (Chiefs demand); even StubHub nets ~$115 > current Direct $100.",
+    "34": "List now ~$135 (Cowboys crowd) — same logic as Chiefs pass.",
+    "36": "Hold $460 on TickPick (nets ~$391); test raise to ~$499 on one and watch takeup.",
+    "37": "Hold $460 on TickPick (nets ~$391); plenty of runway, decide hold vs raise late Sept/Oct.",
+    "38": "Hold — cannot list until 2027 verified resale opens. Ticketmaster valid; re-price then.",
+    "39": "Hold — cannot list until 2027; $500 target likely undersells the final, re-price upward when window opens."
   }
 }
