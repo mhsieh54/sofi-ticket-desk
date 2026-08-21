@@ -317,6 +317,30 @@
       "clientReserved": 0,
       "notes": "Reimbursed at fair market value (08/17 memo): $509.00/tkt net = $1018/pair. Derived from $599/tkt market gross less 15% fee. +$117.70 pair profit, 13% ROI.",
       "askSetAt": "2026-08-10"
+    },
+    {
+      "id": 17,
+      "event": "Rams vs Saints",
+      "date": "2026-08-22",
+      "section": "C135",
+      "row": "6",
+      "seats": "1-2",
+      "qty": 2,
+      "face": 278,
+      "fmv": 278,
+      "category": "CLIENT",
+      "status": "sold",
+      "platform": "Direct",
+      "ask": 278,
+      "sold": true,
+      "soldDate": "2026-08-21",
+      "soldPayout": 278,
+      "purchaseDate": "2026-05-11",
+      "targetAsk": null,
+      "targetPlatform": null,
+      "targetSellDate": null,
+      "clientReserved": 2,
+      "notes": "Preseason — $14 floor confirms zero resale value. Bill to company at face, $556 total."
     }
   ]
 }
