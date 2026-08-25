@@ -365,6 +365,31 @@
       "targetSellDate": null,
       "clientReserved": 1,
       "notes": "Lot ORANGE, no tailgating. 1 of 9-pass season bundle ($639 ÷ 9 = $71/pass). Preseason — bills to client with the Saints seats. Acct #18848266."
+    },
+    {
+      "id": 9,
+      "event": "BTS World Tour 'Arirang'",
+      "date": "2026-09-05",
+      "section": "343",
+      "row": "7",
+      "seats": "—",
+      "qty": 2,
+      "face": 187.25,
+      "fmv": null,
+      "category": "SELL",
+      "status": "sold",
+      "platform": "TickPick",
+      "ask": 590,
+      "sold": true,
+      "soldDate": "2026-08-25",
+      "soldPayout": 501.5,
+      "purchaseDate": "2026-01-21",
+      "targetAsk": 625,
+      "targetPlatform": "StubHub",
+      "targetSellDate": "2026-07-26",
+      "clientReserved": 0,
+      "notes": "Changed platforms, priced at 590, #7 lowest price on platform. ",
+      "askSetAt": "2026-08-24"
     }
   ]
 }
