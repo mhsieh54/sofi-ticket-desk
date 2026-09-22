@@ -87,7 +87,7 @@
       "category": "CLIENT",
       "status": "listed",
       "platform": "Direct",
-      "ask": 275,
+      "ask": 212,
       "sold": false,
       "soldDate": null,
       "soldPayout": null,
@@ -97,7 +97,7 @@
       "targetSellDate": null,
       "clientReserved": 4,
       "notes": "Listed for sale, but if selling at lost can pull from resale market, reserved for client entertainment. Bill company at FMV ~$275/tkt = $1,100.",
-      "askSetAt": "2026-07-28"
+      "askSetAt": "2026-09-22"
     },
     {
       "id": 13,
