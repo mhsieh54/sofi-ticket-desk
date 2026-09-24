@@ -35,7 +35,7 @@
       "qty": 2,
       "face": 187.25,
       "fmv": null,
-      "category": "SELL",
+      "category": "ATTEND",
       "status": "held",
       "platform": null,
       "ask": null,
@@ -47,7 +47,8 @@
       "targetPlatform": null,
       "targetSellDate": null,
       "clientReserved": 0,
-      "notes": "Split from the 4-pack (id 7) — 2 for resale. Event Sept 30; set an ask to list."
+      "notes": "Split from the 4-pack (id 7) — 2 for resale. Event Sept 30; set an ask to list.",
+      "askSetAt": null
     },
     {
       "id": 10,
