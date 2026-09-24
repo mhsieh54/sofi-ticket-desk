@@ -390,6 +390,31 @@
       "clientReserved": 0,
       "notes": "Changed platforms, priced at 590, #7 lowest price on platform. ",
       "askSetAt": "2026-08-24"
+    },
+    {
+      "id": 18,
+      "event": "Rams vs Giants",
+      "date": "2026-09-21",
+      "section": "C135",
+      "row": "6",
+      "seats": "1-2",
+      "qty": 2,
+      "face": 352,
+      "fmv": null,
+      "category": "ATTEND",
+      "status": "sold",
+      "platform": "Direct",
+      "ask": 0,
+      "sold": true,
+      "soldDate": "2026-09-24",
+      "soldPayout": 0,
+      "purchaseDate": "2026-05-11",
+      "targetAsk": null,
+      "targetPlatform": null,
+      "targetSellDate": null,
+      "clientReserved": 0,
+      "notes": "+ Hannah",
+      "askSetAt": null
     }
   ]
 }
