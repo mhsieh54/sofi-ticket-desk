@@ -540,6 +540,31 @@
       "clientReserved": 0,
       "notes": "Keeping 2 of the original 4-pack to attend. Other 2 split off for resale (id 40).",
       "askSetAt": null
+    },
+    {
+      "id": 40,
+      "event": "Bruno Mars - The Romantic Tour (SELL)",
+      "date": "2026-09-30",
+      "section": "234",
+      "row": "8",
+      "seats": "—",
+      "qty": 2,
+      "face": 187.25,
+      "fmv": null,
+      "category": "KEEP",
+      "status": "sold",
+      "platform": "Direct",
+      "ask": 187,
+      "sold": true,
+      "soldDate": "2026-10-01",
+      "soldPayout": 187,
+      "purchaseDate": "2026-03-10",
+      "targetAsk": null,
+      "targetPlatform": null,
+      "targetSellDate": null,
+      "clientReserved": 0,
+      "notes": "Split from the 4-pack (id 7) — 2 for resale. Event Sept 30; set an ask to list.",
+      "askSetAt": null
     }
   ]
 }
