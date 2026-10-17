@@ -1,30 +1,6 @@
 {
   "positions": [
     {
-      "id": 20,
-      "event": "Rams vs Cardinals",
-      "date": "2026-10-18",
-      "section": "C135",
-      "row": "6",
-      "seats": "1-2",
-      "qty": 2,
-      "face": 333,
-      "fmv": null,
-      "category": "ATTEND",
-      "status": "held",
-      "platform": null,
-      "ask": null,
-      "sold": false,
-      "soldDate": null,
-      "soldPayout": null,
-      "purchaseDate": "2026-05-11",
-      "targetAsk": null,
-      "targetPlatform": null,
-      "targetSellDate": null,
-      "clientReserved": 0,
-      "notes": "Lowest-demand game of season — attending, low opportunity cost."
-    },
-    {
       "id": 21,
       "event": "Rams vs Chargers",
       "date": "2026-11-01",
