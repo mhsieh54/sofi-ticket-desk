@@ -565,6 +565,31 @@
       "clientReserved": 0,
       "notes": "Split from the 4-pack (id 7) — 2 for resale. Event Sept 30; set an ask to list.",
       "askSetAt": null
+    },
+    {
+      "id": 10,
+      "event": "Bruno Mars - The Romantic Tour",
+      "date": "2026-10-07",
+      "section": "FL-A5",
+      "row": "6",
+      "seats": "—",
+      "qty": 6,
+      "face": 653.9,
+      "fmv": null,
+      "category": "ATTEND",
+      "status": "sold",
+      "platform": "Direct",
+      "ask": 0,
+      "sold": true,
+      "soldDate": "2026-10-17",
+      "soldPayout": 0,
+      "purchaseDate": "2026-01-15",
+      "targetAsk": null,
+      "targetPlatform": null,
+      "targetSellDate": null,
+      "clientReserved": 2,
+      "notes": "Hannah, Mark, Jimmy, Peggy, Helen, need a +1",
+      "askSetAt": null
     }
   ]
 }
