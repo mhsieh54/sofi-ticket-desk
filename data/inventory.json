@@ -11,9 +11,9 @@
       "face": 375,
       "fmv": null,
       "category": "SELL",
-      "status": "held",
-      "platform": null,
-      "ask": null,
+      "status": "listed",
+      "platform": "TickPick",
+      "ask": 489,
       "sold": false,
       "soldDate": null,
       "soldPayout": null,
@@ -22,7 +22,8 @@
       "targetPlatform": null,
       "targetSellDate": null,
       "clientReserved": 0,
-      "notes": "In San Diego, need to sell. Biggest LA-rivalry atmosphere — attending."
+      "notes": "In San Diego, need to sell. Biggest LA-rivalry atmosphere — attending.",
+      "askSetAt": "2026-10-26"
     },
     {
       "id": 22,
