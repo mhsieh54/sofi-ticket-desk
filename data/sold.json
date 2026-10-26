@@ -687,6 +687,31 @@
       "clientReserved": 0,
       "notes": "Order #35-27620/WES, Seat License & Suite Member Presale",
       "askSetAt": "2026-08-07"
+    },
+    {
+      "id": 37,
+      "event": "JAY-Z30",
+      "date": "2026-10-24",
+      "section": "238",
+      "row": "6",
+      "seats": "15-16",
+      "qty": 2,
+      "face": 341.85,
+      "fmv": null,
+      "category": "SELL",
+      "status": "sold",
+      "platform": "Direct",
+      "ask": 342,
+      "sold": true,
+      "soldDate": "2026-10-26",
+      "soldPayout": 342,
+      "purchaseDate": "2026-07-27",
+      "targetAsk": null,
+      "targetPlatform": null,
+      "targetSellDate": null,
+      "clientReserved": 0,
+      "notes": "Order #35-27620/WES, Seat License & Suite Member Presale",
+      "askSetAt": "2026-08-07"
     }
   ]
 }
