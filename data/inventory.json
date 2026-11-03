@@ -61,9 +61,9 @@
       "face": 707,
       "fmv": null,
       "category": "SELL",
-      "status": "held",
-      "platform": null,
-      "ask": null,
+      "status": "listed",
+      "platform": "TickPick",
+      "ask": 900,
       "sold": false,
       "soldDate": null,
       "soldPayout": null,
@@ -72,7 +72,8 @@
       "targetPlatform": "StubHub",
       "targetSellDate": "2026-11-20",
       "clientReserved": 0,
-      "notes": "Highest floor of season ($233) — could clear $1,100+ in run-up. Target ROI 20% — accepted below the 30% floor rule as a confirmed capital-preservation sell."
+      "notes": "Highest floor of season ($233) — could clear $1,100+ in run-up. Target ROI 20% — accepted below the 30% floor rule as a confirmed capital-preservation sell.",
+      "askSetAt": "2026-11-03"
     },
     {
       "id": 25,
