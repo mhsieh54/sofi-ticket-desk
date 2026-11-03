@@ -1,31 +1,6 @@
 {
   "positions": [
     {
-      "id": 21,
-      "event": "Rams vs Chargers",
-      "date": "2026-11-01",
-      "section": "C135",
-      "row": "6",
-      "seats": "1-2",
-      "qty": 2,
-      "face": 375,
-      "fmv": null,
-      "category": "SELL",
-      "status": "listed",
-      "platform": "TickPick",
-      "ask": 450,
-      "sold": false,
-      "soldDate": null,
-      "soldPayout": null,
-      "purchaseDate": "2026-05-11",
-      "targetAsk": null,
-      "targetPlatform": null,
-      "targetSellDate": null,
-      "clientReserved": 0,
-      "notes": "In San Diego, need to sell. Biggest LA-rivalry atmosphere — attending.",
-      "askSetAt": "2026-10-28"
-    },
-    {
       "id": 22,
       "event": "Rams vs Packers",
       "date": "2026-11-25",
