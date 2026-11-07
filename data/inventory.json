@@ -13,7 +13,7 @@
       "category": "SELL",
       "status": "listed",
       "platform": "TickPick",
-      "ask": 757,
+      "ask": 820,
       "sold": false,
       "soldDate": null,
       "soldPayout": null,
@@ -23,7 +23,7 @@
       "targetSellDate": "2026-10-26",
       "clientReserved": 0,
       "notes": "Thanksgiving Eve — target revised up to $1,000. 36% ROI, meets 30% floor.",
-      "askSetAt": "2026-11-03"
+      "askSetAt": "2026-11-07"
     },
     {
       "id": 24,
