@@ -220,6 +220,30 @@
       "clientReserved": 0,
       "notes": "Order #391744063, Rose Bowl Stadium",
       "askSetAt": null
+    },
+    {
+      "id": 41,
+      "event": "BIGBANG 2027 World Tour",
+      "date": "2027-03-13",
+      "section": "232",
+      "row": "11",
+      "seats": "19-20",
+      "qty": 2,
+      "face": 374.6,
+      "fmv": null,
+      "category": "SELL",
+      "status": "held",
+      "platform": null,
+      "ask": null,
+      "sold": false,
+      "soldDate": null,
+      "soldPayout": null,
+      "purchaseDate": "2026-11-11",
+      "targetAsk": null,
+      "targetPlatform": null,
+      "targetSellDate": null,
+      "clientReserved": 0,
+      "notes": "Seat License & Suite Member Presale, SoFi Stadium - Inglewood CA"
     }
   ]
 }
