@@ -232,9 +232,9 @@
       "face": 374.6,
       "fmv": null,
       "category": "SELL",
-      "status": "held",
-      "platform": null,
-      "ask": null,
+      "status": "listed",
+      "platform": "Vivid Seats",
+      "ask": 445,
       "sold": false,
       "soldDate": null,
       "soldPayout": null,
@@ -243,7 +243,8 @@
       "targetPlatform": null,
       "targetSellDate": null,
       "clientReserved": 0,
-      "notes": "Seat License & Suite Member Presale, SoFi Stadium - Inglewood CA"
+      "notes": "Seat License & Suite Member Presale, SoFi Stadium - Inglewood CA",
+      "askSetAt": "2026-11-11"
     }
   ]
 }
