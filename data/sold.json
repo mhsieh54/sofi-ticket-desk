@@ -762,6 +762,31 @@
       "clientReserved": 0,
       "notes": "In San Diego, need to sell. Biggest LA-rivalry atmosphere — attending.",
       "askSetAt": "2026-10-28"
+    },
+    {
+      "id": 22,
+      "event": "Rams vs Packers",
+      "date": "2026-11-25",
+      "section": "C135",
+      "row": "6",
+      "seats": "1-2",
+      "qty": 2,
+      "face": 625,
+      "fmv": null,
+      "category": "SELL",
+      "status": "sold",
+      "platform": "Direct",
+      "ask": 625,
+      "sold": true,
+      "soldDate": "2026-11-21",
+      "soldPayout": 625,
+      "purchaseDate": "2026-05-11",
+      "targetAsk": 1000,
+      "targetPlatform": "StubHub",
+      "targetSellDate": "2026-10-26",
+      "clientReserved": 0,
+      "notes": "Thanksgiving Eve — target revised up to $1,000. 36% ROI, meets 30% floor.",
+      "askSetAt": "2026-11-07"
     }
   ]
 }
